@@ -47,15 +47,9 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
       (',', 'punctuation')
     ],
     [
-      ('  apps', 'variable'),
+      ('  age', 'variable'),
       (': ', 'plain'),
-      ('12', 'number'),
-      (',', 'punctuation')
-    ],
-    [
-      ('  downloads', 'variable'),
-      (': ', 'plain'),
-      ("'50K+'", 'string'),
+      ('27', 'number'),
       (',', 'punctuation')
     ],
     [

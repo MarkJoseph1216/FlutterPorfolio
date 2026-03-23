@@ -135,7 +135,7 @@ abstract final class PortfolioRepository {
           'Developed a free movie streaming application that allows users to'
           ' browse and watch films through an intuitive and user friendly interface.'
           'The platform focuses on accessibility and seamless streaming performance.',
-      techStack: ['Flutter', 'Dart', 'Flutter Animate', 'Gemini API'],
+      techStack: ['Flutter', 'Dart', 'Flutter Animate'],
       category: ProjectCategory.personal,
       urlLink:
           'https://www.tiktok.com/@dev.imrkjoseph/video/7350223416059759878',
