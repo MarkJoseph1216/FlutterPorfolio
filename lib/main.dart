@@ -1,9 +1,29 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:js' as js;
 
 import 'core/providers/theme_provider.dart';
 import 'presentation/screens/home/home_screen.dart';
 
-void main() => runApp(const PortfolioApp());
+void main() {
+  runApp(const PortfolioApp());
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _dismissLoader();
+  });
+}
+
+void _dismissLoader() {
+  if (!kIsWeb) return;
+  js.context.callMethod('eval', [
+    '''
+    const el = document.getElementById("loader");
+    if (el) {
+      el.classList.add("hide");
+      setTimeout(() => el.remove(), 500);
+    }
+    '''
+  ]);
+}
 
 class PortfolioApp extends StatefulWidget {
   const PortfolioApp({super.key});

@@ -30,6 +30,7 @@ class _SectionWrapperState extends State<SectionWrapper>
 
   final _key = GlobalKey();
   bool _triggered = false;
+  bool _checking = false; // ← debounce guard
   ScrollController? _scrollCtrl;
 
   @override
@@ -60,16 +61,25 @@ class _SectionWrapperState extends State<SectionWrapper>
   }
 
   void _check() {
-    if (_triggered || !mounted) return;
-    final box = _key.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null || !box.attached) return;
-    final screenH = MediaQuery.sizeOf(context).height;
-    if (box.localToGlobal(Offset.zero).dy < screenH * 0.92) {
-      _triggered = true;
-      _scrollCtrl?.removeListener(_check);
-      _scrollCtrl = null;
-      _ctrl.forward();
-    }
+    // Skip if already triggered, unmounted, or a check is already queued
+    if (_triggered || !mounted || _checking) return;
+    _checking = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checking = false;
+      if (_triggered || !mounted) return;
+
+      final box = _key.currentContext?.findRenderObject() as RenderBox?;
+      if (box == null || !box.attached) return;
+
+      final screenH = MediaQuery.sizeOf(context).height;
+      if (box.localToGlobal(Offset.zero).dy < screenH * 0.92) {
+        _triggered = true;
+        _scrollCtrl?.removeListener(_check);
+        _scrollCtrl = null;
+        _ctrl.forward();
+      }
+    });
   }
 
   @override

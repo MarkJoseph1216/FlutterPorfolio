@@ -37,10 +37,6 @@ Future<void> _launchUrl(String url) async {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Glitch painter — only paints when progress > 0
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _GlitchPainter extends CustomPainter {
   const _GlitchPainter({
     required this.progress,
@@ -331,10 +327,6 @@ class _SideProjectsSectionState extends State<SideProjectsSection>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Project card — optimized glitch effect
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _ProjectCard extends StatefulWidget {
   const _ProjectCard({
     required this.project,
@@ -357,13 +349,12 @@ class _ProjectCardState extends State<_ProjectCard>
 
   late final AnimationController _glitchCtrl;
 
-  // ✅ Throttle glitch redraws — only reseed every 2nd tick not every frame
   int _tickCount = 0;
+  final _rng = math.Random();
 
   @override
   void initState() {
     super.initState();
-    // ✅ Slower duration reduces CPU pressure significantly on web
     _glitchCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -379,11 +370,10 @@ class _ProjectCardState extends State<_ProjectCard>
   }
 
   void _tickGlitch() {
-    // ✅ Only reseed every 3rd tick — reduces setState calls by 66%
     _tickCount++;
     if (_tickCount % 3 == 0 && _glitchCtrl.isAnimating) {
-      if (math.Random().nextDouble() > 0.5) {
-        setState(() => _glitchSeed = math.Random().nextInt(9999));
+      if (_rng.nextDouble() > 0.5) {
+        setState(() => _glitchSeed = _rng.nextInt(9999));
       }
     }
   }
@@ -415,7 +405,6 @@ class _ProjectCardState extends State<_ProjectCard>
         onTap: widget.onTap,
         child: AnimatedBuilder(
           animation: _glitchCtrl,
-          // ✅ Pass child so the card content doesn't rebuild on glitch ticks
           builder: (_, child) => CustomPaint(
             painter: _GlitchPainter(
               progress: _glitchCtrl.value,
@@ -693,8 +682,10 @@ class _DeckOverlay extends StatelessWidget {
                         child: RepaintBoundary(
                           child: CustomPaint(
                             painter: _ScanlinePainter(color: cyber),
+                            isComplex: true,
+                            willChange: false,
                           ),
-                        ),
+                        )
                       ),
                     ),
                   Positioned(

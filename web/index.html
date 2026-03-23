@@ -12,20 +12,66 @@
   <title>Mark Joseph — Android Developer</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    body { background-color: #0C0C0C; margin: 0; padding: 0; overflow: hidden; }
+    body {
+      background-color: #0C0C0C;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0C0C0C;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+
+    #loader.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00FFFF;
+      margin: 0 4px;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50%       { opacity: 1;   transform: scale(1.2); }
+    }
   </style>
 </head>
 <body>
+
+<div id="loader">
+  <div class="dot"></div>
+  <div class="dot"></div>
+  <div class="dot"></div>
+</div>
+
 <script>
+  const ua = navigator.userAgent.toLowerCase();
+  const isMobile = /iphone|ipad|ipod|android|windows phone|mobile/.test(ua)
+    || navigator.maxTouchPoints > 1;
+  const isSafari = /safari/.test(ua) && !/chrome|chromium|edg/.test(ua);
+
   window.flutterConfiguration = {
-    renderer: (() => {
-      const ua = navigator.userAgent.toLowerCase();
-      const isSafari = /safari/.test(ua) && !/chrome/.test(ua);
-      const isMobile = /iphone|ipad|ipod|android/.test(ua);
-      return (isSafari || isMobile) ? 'html' : 'canvaskit';
-    })()
+    renderer: (isMobile || isSafari) ? 'html' : 'canvaskit'
   };
 </script>
-<script src="flutter_bootstrap.js" async></script>
+<script src="flutter_bootstrap.js" defer></script>
+
 </body>
 </html>
