@@ -1,5 +1,5 @@
 {
-  "buildCommand": "bash build.sh",
+  "buildCommand": "bash ./build.sh",
   "outputDirectory": "build/web",
   "installCommand": "echo 'skip'",
   "headers": [
