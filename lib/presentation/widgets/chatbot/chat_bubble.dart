@@ -10,7 +10,7 @@ import 'chatbot_widget.dart'; // adjust path if needed
 class ChatBubble extends StatelessWidget {
   const ChatBubble({super.key});
 
-  static const String _geminiApiKey = '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';
+  static const String _geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
 
   @override
   Widget build(BuildContext context) {
