@@ -49,7 +49,7 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
     [
       ('  age', 'variable'),
       (': ', 'plain'),
-      ('27', 'number'),
+      ('28', 'number'),
       (',', 'punctuation')
     ],
     [
