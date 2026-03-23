@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Alex Rivera — Android & Flutter Developer Portfolio">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Alex Rivera">
+  <title>Alex Rivera — Android Developer</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { background-color: #0C0C0C; margin: 0; padding: 0; overflow: hidden; }
+  </style>
+</head>
+<body>
+<script>
+  window.flutterConfiguration = {
+    renderer: (() => {
+      const ua = navigator.userAgent.toLowerCase();
+      const isSafari = /safari/.test(ua) && !/chrome/.test(ua);
+      const isMobile = /iphone|ipad|ipod|android/.test(ua);
+      return (isSafari || isMobile) ? 'html' : 'canvaskit';
+    })()
+  };
+</script>
+<script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
