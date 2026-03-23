@@ -11,6 +11,8 @@
   <meta name="apple-mobile-web-app-title" content="Mark Joseph">
   <title>Mark Joseph — Android Developer</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="preload" href="canvaskit/canvaskit.js" as="script">
+  <link rel="preload" href="canvaskit/canvaskit.wasm" as="fetch" crossorigin="anonymous">
   <style>
     body {
       background-color: #0C0C0C;
@@ -67,8 +69,8 @@
     || navigator.maxTouchPoints > 1;
   const isSafari = /safari/.test(ua) && !/chrome|chromium|edg/.test(ua);
 
-  window.flutterConfiguration = {
-    renderer: (isMobile || isSafari) ? 'html' : 'canvaskit'
+   window.flutterConfiguration = {
+    renderer: 'canvaskit'
   };
 </script>
 <script src="flutter_bootstrap.js" defer></script>

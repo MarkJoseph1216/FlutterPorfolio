@@ -53,19 +53,6 @@ class _WorkSectionState extends State<WorkSection>
     super.dispose();
   }
 
-  Future<void> _openDetail(ProjectModel project) async {
-    setState(() => _activeProject = project);
-    _detailEntry = OverlayEntry(
-      builder: (_) => _ProjectDetailOverlay(
-        project: project,
-        controller: _detailCtrl,
-        onClose: _closeDetail,
-      ),
-    );
-    Overlay.of(context).insert(_detailEntry!);
-    await _detailCtrl.forward();
-  }
-
   Future<void> _closeDetail() async {
     await _detailCtrl.reverse();
     _detailEntry?.remove();
@@ -123,10 +110,6 @@ class _WorkSectionState extends State<WorkSection>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Project row — optimized hover sweep
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _ProjectRow extends StatefulWidget {
   const _ProjectRow({required this.project, required this.index});
 
@@ -137,15 +120,13 @@ class _ProjectRow extends StatefulWidget {
   State<_ProjectRow> createState() => _ProjectRowState();
 }
 
-class _ProjectRowState extends State<_ProjectRow>
-    with SingleTickerProviderStateMixin {
+class _ProjectRowState extends State<_ProjectRow> with SingleTickerProviderStateMixin {
   bool _expanded = false;
   bool _hovered = false;
 
-  // ✅ Use AnimationController instead of AnimatedFractionallySizedBox
-  // — controller only ticks when hovered, not during scroll
   late final AnimationController _sweepCtrl;
   late final Animation<double> _sweepAnim;
+  late final bool _hasAnimated = false;
 
   @override
   void initState() {
@@ -181,7 +162,7 @@ class _ProjectRowState extends State<_ProjectRow>
     final c = AppColors.of(context);
     final p = widget.project;
 
-    return MouseRegion(
+    final row = MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => _onEnter(),
       onExit: (_) => _onExit(),
@@ -275,6 +256,14 @@ class _ProjectRowState extends State<_ProjectRow>
           delay: Duration(milliseconds: 100 + widget.index * 80),
           duration: 500.ms,
         );
+
+    if (!_hasAnimated) {
+      return row.animate().fadeIn(
+        delay: Duration(milliseconds: 100 + widget.index * 80),
+        duration: 500.ms,
+      );
+    }
+    return row;
   }
 }
 
