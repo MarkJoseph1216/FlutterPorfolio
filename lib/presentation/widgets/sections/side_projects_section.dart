@@ -37,6 +37,10 @@ Future<void> _launchUrl(String url) async {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Glitch painter
+// ─────────────────────────────────────────────────────────────────────────────
+
 class _GlitchPainter extends CustomPainter {
   const _GlitchPainter({
     required this.progress,
@@ -292,16 +296,18 @@ class _SideProjectsSectionState extends State<SideProjectsSection>
         Expanded(
           child: Column(
             children: left
-                .map((e) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: RepaintBoundary(
-                        child: _ProjectCard(
-                          project: e.value,
-                          entryIndex: e.key,
-                          onTap: () => _openDetail(e.value),
-                        ),
+                .map(
+                  (e) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: RepaintBoundary(
+                      child: _ProjectCard(
+                        project: e.value,
+                        entryIndex: e.key,
+                        onTap: () => _openDetail(e.value),
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -309,16 +315,18 @@ class _SideProjectsSectionState extends State<SideProjectsSection>
         Expanded(
           child: Column(
             children: right
-                .map((e) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: RepaintBoundary(
-                        child: _ProjectCard(
-                          project: e.value,
-                          entryIndex: e.key,
-                          onTap: () => _openDetail(e.value),
-                        ),
+                .map(
+                  (e) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: RepaintBoundary(
+                      child: _ProjectCard(
+                        project: e.value,
+                        entryIndex: e.key,
+                        onTap: () => _openDetail(e.value),
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -326,6 +334,13 @@ class _SideProjectsSectionState extends State<SideProjectsSection>
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Project card
+// FIX 1: _glitchSeed uses ValueNotifier — no setState on every animation tick
+// FIX 2: _hovered uses ValueNotifier — hover changes don't rebuild card tree
+// FIX 3: .animate() only wraps once via _didAnimate flag
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _ProjectCard extends StatefulWidget {
   const _ProjectCard({
@@ -344,11 +359,14 @@ class _ProjectCard extends StatefulWidget {
 
 class _ProjectCardState extends State<_ProjectCard>
     with SingleTickerProviderStateMixin {
-  bool _hovered = false;
-  int _glitchSeed = 0;
+  // ✅ FIX 1 & 2: ValueNotifiers instead of setState — no widget tree rebuilds
+  final _hovered = ValueNotifier<bool>(false);
+  final _glitchSeed = ValueNotifier<int>(0);
+
+  // ✅ FIX 3: only wrap .animate() once
+  bool _didAnimate = false;
 
   late final AnimationController _glitchCtrl;
-
   int _tickCount = 0;
   final _rng = math.Random();
 
@@ -366,26 +384,29 @@ class _ProjectCardState extends State<_ProjectCard>
   void dispose() {
     _glitchCtrl.removeListener(_tickGlitch);
     _glitchCtrl.dispose();
+    _hovered.dispose();
+    _glitchSeed.dispose();
     super.dispose();
   }
 
+  // ✅ FIX 1: No setState — just update ValueNotifier value
   void _tickGlitch() {
     _tickCount++;
     if (_tickCount % 3 == 0 && _glitchCtrl.isAnimating) {
       if (_rng.nextDouble() > 0.5) {
-        setState(() => _glitchSeed = _rng.nextInt(9999));
+        _glitchSeed.value = _rng.nextInt(9999);
       }
     }
   }
 
   void _onEnter() {
-    setState(() => _hovered = true);
+    _hovered.value = true;
     _tickCount = 0;
     _glitchCtrl.repeat(reverse: true);
   }
 
   void _onExit() {
-    setState(() => _hovered = false);
+    _hovered.value = false;
     _glitchCtrl.reverse().then((_) {
       if (mounted) _glitchCtrl.stop();
     });
@@ -397,40 +418,54 @@ class _ProjectCardState extends State<_ProjectCard>
     final p = widget.project;
     final cyber = _cyber(context);
 
-    return MouseRegion(
+    // ✅ FIX 2: Only the glitch painter + card border react to hover/glitch
+    // The rest of the card content is a static child passed through
+    final card = MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => _onEnter(),
       onExit: (_) => _onExit(),
       child: GestureDetector(
         onTap: widget.onTap,
-        child: AnimatedBuilder(
-          animation: _glitchCtrl,
-          builder: (_, child) => CustomPaint(
-            painter: _GlitchPainter(
-              progress: _glitchCtrl.value,
-              accentColor: cyber,
-              seed: _glitchSeed,
+        child: ValueListenableBuilder<int>(
+          valueListenable: _glitchSeed,
+          builder: (_, seed, child) => AnimatedBuilder(
+            animation: _glitchCtrl,
+            builder: (_, innerChild) => CustomPaint(
+              painter: _GlitchPainter(
+                progress: _glitchCtrl.value,
+                accentColor: cyber,
+                seed: seed,
+              ),
+              // ✅ card content is passed as child — not rebuilt on glitch ticks
+              child: innerChild,
             ),
+            // ✅ child passed through AnimatedBuilder so it isn't rebuilt
             child: child,
           ),
-          child: AnimatedContainer(
-            duration: 200.ms,
-            decoration: BoxDecoration(
-              color: _hovered ? _cyberGlow(context) : c.surface,
-              border: Border.all(
-                color: _hovered ? cyber.withOpacity(0.45) : c.border,
-                width: _hovered ? 1.5 : 1,
+          // ✅ card body is the static child of ValueListenableBuilder
+          child: ValueListenableBuilder<bool>(
+            valueListenable: _hovered,
+            builder: (_, hov, child) => AnimatedContainer(
+              duration: 200.ms,
+              decoration: BoxDecoration(
+                color: hov ? _cyberGlow(context) : c.surface,
+                border: Border.all(
+                  color: hov ? cyber.withOpacity(0.45) : c.border,
+                  width: hov ? 1.5 : 1,
+                ),
+                boxShadow: hov
+                    ? [
+                        BoxShadow(
+                          color: cyber.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ]
+                    : [],
               ),
-              boxShadow: _hovered
-                  ? [
-                      BoxShadow(
-                        color: cyber.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 6),
-                      ),
-                    ]
-                  : [],
+              child: child,
             ),
+            // ✅ card content never rebuilds on hover — only border/bg animates
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -438,12 +473,15 @@ class _ProjectCardState extends State<_ProjectCard>
                 children: [
                   Row(
                     children: [
-                      Text(
-                        p.index,
-                        style: AppFonts.mono(
-                          size: 10,
-                          color:
-                              _hovered ? cyber.withOpacity(0.6) : c.textGhost,
+                      // ✅ Only index text color reacts to hover
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _hovered,
+                        builder: (_, hov, __) => Text(
+                          p.index,
+                          style: AppFonts.mono(
+                            size: 10,
+                            color: hov ? cyber.withOpacity(0.6) : c.textGhost,
+                          ),
                         ),
                       ),
                       const Spacer(),
@@ -453,9 +491,13 @@ class _ProjectCardState extends State<_ProjectCard>
                   ),
                   const SizedBox(height: 14),
 
-                  // ✅ Use Transform directly — no AnimatedContainer for transform
-                  Transform.translate(
-                    offset: Offset(_hovered ? 3.0 : 0.0, 0),
+                  // ✅ Title shift reacts to hover via ValueListenableBuilder
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _hovered,
+                    builder: (_, hov, child) => Transform.translate(
+                      offset: Offset(hov ? 3.0 : 0.0, 0),
+                      child: child,
+                    ),
                     child: Text(
                       p.title,
                       style: AppFonts.heading(
@@ -471,15 +513,18 @@ class _ProjectCardState extends State<_ProjectCard>
                   Row(
                     children: [
                       if (p.role != null)
-                        Text(
-                          p.role!,
-                          style: AppFonts.label(
-                            size: 11,
-                            color:
-                                _hovered ? cyber.withOpacity(0.7) : c.textMuted,
+                        // ✅ Role color reacts to hover
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _hovered,
+                          builder: (_, hov, __) => Text(
+                            p.role!,
+                            style: AppFonts.label(
+                              size: 11,
+                              color: hov ? cyber.withOpacity(0.7) : c.textMuted,
+                            ),
                           ),
                         ),
-                        const Spacer(),
+                      const Spacer(),
                       Text(
                         p.year,
                         style: AppFonts.mono(size: 10, color: c.textGhost),
@@ -510,9 +555,13 @@ class _ProjectCardState extends State<_ProjectCard>
                   ),
                   const SizedBox(height: 14),
 
-                  // ✅ Visibility instead of AnimatedOpacity — no compositor layer
-                  Opacity(
-                    opacity: _hovered ? 1.0 : 0.0,
+                  // ✅ "View details" opacity reacts to hover
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _hovered,
+                    builder: (_, hov, child) => Opacity(
+                      opacity: hov ? 1.0 : 0.0,
+                      child: child,
+                    ),
                     child: Row(
                       children: [
                         Text(
@@ -528,16 +577,23 @@ class _ProjectCardState extends State<_ProjectCard>
           ),
         ),
       ),
-      // ✅ onPlay ensures animation only fires once on first build
-    ).animate(onPlay: (c) => c.forward()).fadeIn(
-          delay: Duration(milliseconds: 100 + widget.entryIndex * 80),
-          duration: 400.ms,
-        );
+    );
+
+    // ✅ FIX 3: Only wrap .animate() on first build, not on every hover rebuild
+    if (!_didAnimate) {
+      _didAnimate = true;
+      return card.animate(onPlay: (c) => c.forward()).fadeIn(
+            delay: Duration(milliseconds: 100 + widget.entryIndex * 80),
+            duration: 400.ms,
+          );
+    }
+    return card;
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // View all button
+// FIX: .animate() only wraps once via _didAnimate flag
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _ViewAllButton extends StatefulWidget {
@@ -551,17 +607,25 @@ class _ViewAllButton extends StatefulWidget {
 }
 
 class _ViewAllButtonState extends State<_ViewAllButton> {
-  bool _hovered = false;
+  // ✅ ValueNotifier instead of setState
+  final _hovered = ValueNotifier<bool>(false);
+  bool _didAnimate = false;
+
+  @override
+  void dispose() {
+    _hovered.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
     final cyber = _cyber(context);
 
-    return MouseRegion(
+    final btn = MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onEnter: (_) => _hovered.value = true,
+      onExit: (_) => _hovered.value = false,
       child: GestureDetector(
         onTap: widget.onTap,
         child: Row(
@@ -577,37 +641,40 @@ class _ViewAllButtonState extends State<_ViewAllButton> {
                     left: i * 6.0,
                     child: Transform.rotate(
                       angle: (i - 1) * 0.06,
-                      child: Container(
-                        width: 28,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: c.surfaceAlt,
-                          border: Border.all(
-                            color: _hovered ? cyber.withOpacity(0.5) : c.border,
+                      // ✅ Only border/shadow react to hover
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: _hovered,
+                        builder: (_, hov, __) => Container(
+                          width: 28,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: c.surfaceAlt,
+                            border: Border.all(
+                              color: hov ? cyber.withOpacity(0.5) : c.border,
+                            ),
+                            boxShadow: hov
+                                ? [
+                                    BoxShadow(
+                                      color: cyber.withOpacity(0.2),
+                                      blurRadius: 8,
+                                    ),
+                                  ]
+                                : [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.12),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                           ),
-                          boxShadow: _hovered
-                              ? [
-                                  BoxShadow(
-                                    color: cyber.withOpacity(0.2),
-                                    blurRadius: 8,
-                                  )
-                                ]
-                              : [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.12),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  )
-                                ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${i + 1}',
-                            style: AppFonts.mono(
-                              size: 8,
-                              color: _hovered
-                                  ? cyber.withOpacity(0.7)
-                                  : c.textGhost,
+                          child: Center(
+                            child: Text(
+                              '${i + 1}',
+                              style: AppFonts.mono(
+                                size: 8,
+                                color:
+                                    hov ? cyber.withOpacity(0.7) : c.textGhost,
+                              ),
                             ),
                           ),
                         ),
@@ -618,25 +685,38 @@ class _ViewAllButtonState extends State<_ViewAllButton> {
               ),
             ),
             const SizedBox(width: 20),
-            AnimatedDefaultTextStyle(
-              duration: 200.ms,
-              style: AppFonts.label(
-                size: 13,
-                color: _hovered ? cyber : c.textMuted,
+            // ✅ Only text color reacts to hover
+            ValueListenableBuilder<bool>(
+              valueListenable: _hovered,
+              builder: (_, hov, __) => AnimatedDefaultTextStyle(
+                duration: 200.ms,
+                style: AppFonts.label(
+                  size: 13,
+                  color: hov ? cyber : c.textMuted,
+                ),
+                child: Text('View all ${widget.count} more →'),
               ),
-              child: Text('View all ${widget.count} more →'),
             ),
           ],
         ),
       ),
-    )
-        .animate(onPlay: (c) => c.forward())
-        .fadeIn(delay: 500.ms, duration: 400.ms);
+    );
+
+    // ✅ Only wrap .animate() on first build
+    if (!_didAnimate) {
+      _didAnimate = true;
+      return btn
+          .animate(onPlay: (c) => c.forward())
+          .fadeIn(delay: 500.ms, duration: 400.ms);
+    }
+    return btn;
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Deck overlay
+// FIX 4: AnimatedBuilder only wraps the background — cards are static children
+// FIX 5: ScanlinePainter is outside AnimatedBuilder — painted once, never again
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _DeckOverlay extends StatelessWidget {
@@ -660,83 +740,124 @@ class _DeckOverlay extends StatelessWidget {
 
     return Material(
       type: MaterialType.transparency,
-      child: AnimatedBuilder(
-        animation: controller,
-        builder: (context, _) {
-          final bgOpacity = Tween<double>(begin: 0, end: 1)
-              .animate(CurvedAnimation(
-                parent: controller,
-                curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-              ))
-              .value;
-
-          return SizedBox.expand(
-            child: ColoredBox(
-              color: c.background.withOpacity(bgOpacity * 0.96),
-              child: Stack(
-                children: [
-                  if (bgOpacity > 0)
-                    Positioned.fill(
-                      child: Opacity(
-                        opacity: bgOpacity * 0.03,
-                        child: RepaintBoundary(
-                          child: CustomPaint(
-                            painter: _ScanlinePainter(color: cyber),
-                            isComplex: true,
-                            willChange: false,
-                          ),
-                        )
-                      ),
-                    ),
-                  Positioned(
-                    top: 20,
-                    right: 20,
-                    child: Opacity(
-                      opacity: bgOpacity,
-                      child: _CloseButton(onClose: onClose),
-                    ),
+      child: SizedBox.expand(
+        child: Stack(
+          children: [
+            // ✅ FIX 5: Scanlines are completely outside AnimatedBuilder
+            // They're painted ONCE and never touched again
+            Positioned.fill(
+              child: RepaintBoundary(
+                child: Opacity(
+                  opacity: 0.03,
+                  child: CustomPaint(
+                    painter: _ScanlinePainter(color: cyber),
+                    isComplex: true,
+                    willChange: false,
                   ),
-                  Center(
-                    child: SizedBox(
-                      width: mobile ? double.infinity : 600,
-                      height: mobile ? 300 : 380,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: projects.asMap().entries.map((e) {
-                          return _DeckCard(
-                            project: e.value,
-                            cardIndex: e.key,
-                            totalCards: projects.length,
-                            controller: controller,
-                            mobile: mobile,
-                            onTap: () => onCardTap(e.value),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 40,
-                    left: 0,
-                    right: 0,
-                    child: Opacity(
-                      opacity: bgOpacity,
-                      child: Center(
-                        child: Text(
-                          'Tap a card to view details',
-                          style: AppFonts.mono(
-                            size: 12,
-                            color: cyber.withOpacity(0.6),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          );
-        },
+
+            // ✅ FIX 4: Only the background color animates — not the cards
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: controller,
+                builder: (_, __) {
+                  final bgOpacity = Tween<double>(begin: 0, end: 1)
+                      .animate(
+                        CurvedAnimation(
+                          parent: controller,
+                          curve: const Interval(
+                            0.0,
+                            0.4,
+                            curve: Curves.easeOut,
+                          ),
+                        ),
+                      )
+                      .value;
+                  return ColoredBox(
+                    color: c.background.withOpacity(bgOpacity * 0.96),
+                  );
+                },
+              ),
+            ),
+
+            // ✅ Close button — only opacity animates
+            Positioned(
+              top: 20,
+              right: 20,
+              child: AnimatedBuilder(
+                animation: controller,
+                builder: (_, child) {
+                  final opacity = Tween<double>(begin: 0, end: 1)
+                      .animate(
+                        CurvedAnimation(
+                          parent: controller,
+                          curve:
+                              const Interval(0.0, 0.4, curve: Curves.easeOut),
+                        ),
+                      )
+                      .value;
+                  return Opacity(opacity: opacity, child: child);
+                },
+                child: _CloseButton(onClose: onClose),
+              ),
+            ),
+
+            // ✅ FIX 4: Deck cards are OUTSIDE AnimatedBuilder
+            // They have their own per-card animation via _DeckCard internally
+            Center(
+              child: SizedBox(
+                width: mobile ? double.infinity : 600,
+                height: mobile ? 300 : 380,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: projects.asMap().entries.map((e) {
+                    return _DeckCard(
+                      project: e.value,
+                      cardIndex: e.key,
+                      totalCards: projects.length,
+                      controller: controller,
+                      mobile: mobile,
+                      onTap: () => onCardTap(e.value),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+
+            // ✅ Hint text — only opacity animates
+            Positioned(
+              bottom: 40,
+              left: 0,
+              right: 0,
+              child: AnimatedBuilder(
+                animation: controller,
+                builder: (_, child) {
+                  final opacity = Tween<double>(begin: 0, end: 1)
+                      .animate(
+                        CurvedAnimation(
+                          parent: controller,
+                          curve:
+                              const Interval(0.0, 0.4, curve: Curves.easeOut),
+                        ),
+                      )
+                      .value;
+                  return Opacity(opacity: opacity, child: child);
+                },
+                child: Center(
+                  child: Text(
+                    'Tap a card to view details',
+                    style: AppFonts.mono(
+                      size: 12,
+                      color: cyber.withOpacity(0.6),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -744,6 +865,7 @@ class _DeckOverlay extends StatelessWidget {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Deck card
+// FIX: _hovered uses ValueNotifier — no setState, card content not rebuilt
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _DeckCard extends StatefulWidget {
@@ -770,7 +892,9 @@ class _DeckCard extends StatefulWidget {
 class _DeckCardState extends State<_DeckCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _hoverCtrl;
-  bool _hovered = false;
+
+  // ✅ ValueNotifier — hover changes don't rebuild card content
+  final _hovered = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -781,6 +905,7 @@ class _DeckCardState extends State<_DeckCard>
   @override
   void dispose() {
     _hoverCtrl.dispose();
+    _hovered.dispose();
     super.dispose();
   }
 
@@ -805,82 +930,102 @@ class _DeckCardState extends State<_DeckCard>
       curve: Interval(staggerStart, staggerEnd, curve: Curves.easeOutBack),
     );
 
-    final angle = Tween<double>(begin: 0, end: targetAngle).evaluate(entryAnim);
-    final offset =
-        Tween<double>(begin: 0, end: targetOffset).evaluate(entryAnim);
-    final scale = Tween<double>(begin: 0.6, end: 1.0).evaluate(entryAnim);
-    final opacity = Tween<double>(begin: 0, end: 1.0).evaluate(
-      CurvedAnimation(
-        parent: widget.controller,
-        curve:
-            Interval(staggerStart, staggerStart + 0.3, curve: Curves.easeOut),
-      ),
-    );
-
-    final hoverLift = Tween<double>(begin: 0, end: -16)
-        .animate(CurvedAnimation(parent: _hoverCtrl, curve: Curves.easeOut))
-        .value;
-    final hoverScale = Tween<double>(begin: 1.0, end: 1.06)
-        .animate(CurvedAnimation(parent: _hoverCtrl, curve: Curves.easeOut))
-        .value;
-
+    // ✅ Card transform animates via AnimatedBuilder with child pass-through
+    // so the inner content (text, badges) is never rebuilt during animation
     return AnimatedBuilder(
       animation: Listenable.merge([widget.controller, _hoverCtrl]),
-      builder: (_, child) => Transform.translate(
-        offset: Offset(offset, hoverLift),
-        child: Transform.rotate(
-          angle: angle,
-          child: Transform.scale(
-            scale: scale * hoverScale,
-            child: Opacity(
-              opacity: opacity.clamp(0.0, 1.0),
-              // ✅ Pass child so card content doesn't rebuild on animation ticks
-              child: child,
+      builder: (_, child) {
+        final angle =
+            Tween<double>(begin: 0, end: targetAngle).evaluate(entryAnim);
+        final offset =
+            Tween<double>(begin: 0, end: targetOffset).evaluate(entryAnim);
+        final scale = Tween<double>(begin: 0.6, end: 1.0).evaluate(entryAnim);
+        final opacity = Tween<double>(begin: 0, end: 1.0).evaluate(
+          CurvedAnimation(
+            parent: widget.controller,
+            curve: Interval(
+              staggerStart,
+              staggerStart + 0.3,
+              curve: Curves.easeOut,
             ),
           ),
-        ),
-      ),
+        );
+        final hoverLift = Tween<double>(begin: 0, end: -16)
+            .animate(
+              CurvedAnimation(parent: _hoverCtrl, curve: Curves.easeOut),
+            )
+            .value;
+        final hoverScale = Tween<double>(begin: 1.0, end: 1.06)
+            .animate(
+              CurvedAnimation(parent: _hoverCtrl, curve: Curves.easeOut),
+            )
+            .value;
+
+        return Transform.translate(
+          offset: Offset(offset, hoverLift),
+          child: Transform.rotate(
+            angle: angle,
+            child: Transform.scale(
+              scale: scale * hoverScale,
+              child: Opacity(
+                opacity: opacity.clamp(0.0, 1.0),
+                child: child, // ✅ static child — not rebuilt on animation ticks
+              ),
+            ),
+          ),
+        );
+      },
+      // ✅ Card content is the static child — only transforms rebuild above
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (_) {
-          setState(() => _hovered = true);
+          _hovered.value = true;
           _hoverCtrl.forward();
         },
         onExit: (_) {
-          setState(() => _hovered = false);
+          _hovered.value = false;
           _hoverCtrl.reverse();
         },
         child: GestureDetector(
           onTap: widget.onTap,
-          child: Container(
-            width: cardW,
-            height: cardH,
-            decoration: BoxDecoration(
-              color: c.surface,
-              border: Border.all(
-                color: _hovered ? cyber.withOpacity(0.6) : c.border,
-                width: _hovered ? 1.5 : 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: _hovered
-                      ? cyber.withOpacity(0.15)
-                      : Colors.black.withOpacity(0.2),
-                  blurRadius: _hovered ? 24 : 16,
-                  offset: const Offset(0, 8),
+          // ✅ Only border/shadow react to hover via ValueListenableBuilder
+          child: ValueListenableBuilder<bool>(
+            valueListenable: _hovered,
+            builder: (_, hov, child) => Container(
+              width: cardW,
+              height: cardH,
+              decoration: BoxDecoration(
+                color: c.surface,
+                border: Border.all(
+                  color: hov ? cyber.withOpacity(0.6) : c.border,
+                  width: hov ? 1.5 : 1,
                 ),
-              ],
+                boxShadow: [
+                  BoxShadow(
+                    color: hov
+                        ? cyber.withOpacity(0.15)
+                        : Colors.black.withOpacity(0.2),
+                    blurRadius: hov ? 24 : 16,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: child,
             ),
+            // ✅ Card body is static child — never rebuilds on hover
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.project.index,
-                    style: AppFonts.mono(
-                      size: 10,
-                      color: _hovered ? cyber.withOpacity(0.5) : c.textGhost,
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _hovered,
+                    builder: (_, hov, __) => Text(
+                      widget.project.index,
+                      style: AppFonts.mono(
+                        size: 10,
+                        color: hov ? cyber.withOpacity(0.5) : c.textGhost,
+                      ),
                     ),
                   ),
                   const Spacer(),
@@ -899,14 +1044,22 @@ class _DeckCardState extends State<_DeckCard>
                   ),
                   const SizedBox(height: 6),
                   if (widget.project.role != null)
-                    Text(widget.project.role!,
-                        style: AppFonts.mono(size: 10, color: c.textMuted)),
+                    Text(
+                      widget.project.role!,
+                      style: AppFonts.mono(size: 10, color: c.textMuted),
+                    ),
                   const SizedBox(height: 4),
-                  Text(widget.project.year,
-                      style: AppFonts.mono(size: 10, color: c.textGhost)),
+                  Text(
+                    widget.project.year,
+                    style: AppFonts.mono(size: 10, color: c.textGhost),
+                  ),
                   const SizedBox(height: 16),
-                  Opacity(
-                    opacity: _hovered ? 1.0 : 0.0,
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _hovered,
+                    builder: (_, hov, child) => Opacity(
+                      opacity: hov ? 1.0 : 0.0,
+                      child: child,
+                    ),
                     child: Text(
                       'View details →',
                       style: AppFonts.label(size: 10, color: cyber),
@@ -923,7 +1076,7 @@ class _DeckCardState extends State<_DeckCard>
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Project detail overlay — fixed 600×700 modal
+// Project detail overlay
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _ProjectDetailOverlay extends StatelessWidget {
@@ -1029,7 +1182,6 @@ class _ProjectDetailOverlay extends StatelessWidget {
                             children: [
                               _ProjectThumbnail(project: project),
                               const SizedBox(height: 20),
-
                               Row(
                                 children: [
                                   if (project.role != null)
@@ -1062,7 +1214,7 @@ class _ProjectDetailOverlay extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 28),
-                              _SectionLabel(text: 'Tech Stack'),
+                              const _SectionLabel(text: 'Tech Stack'),
                               const SizedBox(height: 10),
                               Wrap(
                                 spacing: 8,
@@ -1072,7 +1224,7 @@ class _ProjectDetailOverlay extends StatelessWidget {
                                     .toList(),
                               ),
                               const SizedBox(height: 28),
-                              _SectionLabel(text: 'Links'),
+                              const _SectionLabel(text: 'Links'),
                               const SizedBox(height: 10),
                               Wrap(
                                 spacing: 12,
@@ -1107,7 +1259,7 @@ class _ProjectDetailOverlay extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Project thumbnail — shows image or styled placeholder
+// Project thumbnail
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _ProjectThumbnail extends StatelessWidget {
@@ -1143,12 +1295,10 @@ class _ProjectThumbnail extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Grid pattern background
         CustomPaint(
           painter: _GridPainter(color: cyber),
           child: const SizedBox.expand(),
         ),
-        // Project initial
         Text(
           project.title.isNotEmpty ? project.title[0].toUpperCase() : '?',
           style: TextStyle(
@@ -1158,7 +1308,6 @@ class _ProjectThumbnail extends StatelessWidget {
             height: 1,
           ),
         ),
-        // Title overlay at bottom
         Positioned(
           bottom: 12,
           left: 16,
@@ -1232,8 +1381,10 @@ class _Badge extends StatelessWidget {
         color: c.surfaceAlt,
         border: Border.all(color: c.border),
       ),
-      child:
-          Text(label, style: AppFonts.mono(size: 11, color: c.textSecondary)),
+      child: Text(
+        label,
+        style: AppFonts.mono(size: 11, color: c.textSecondary),
+      ),
     );
   }
 }
@@ -1307,9 +1458,13 @@ class _CloseButtonState extends State<_CloseButton> {
               color: _hov ? cyber.withOpacity(0.5) : c.border,
             ),
           ),
-          child: Text('✕',
-              style:
-                  AppFonts.mono(size: 12, color: _hov ? cyber : c.textMuted)),
+          child: Text(
+            '✕',
+            style: AppFonts.mono(
+              size: 12,
+              color: _hov ? cyber : c.textMuted,
+            ),
+          ),
         ),
       ),
     );
