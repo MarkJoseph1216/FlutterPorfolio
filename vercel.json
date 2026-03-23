@@ -1,5 +1,5 @@
 {
-  "buildCommand": "chmod +x build.sh && ./build.sh",
+  "buildCommand": "bash build.sh",
   "outputDirectory": "build/web",
   "installCommand": "echo 'skip'",
   "headers": [
