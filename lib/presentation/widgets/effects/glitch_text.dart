@@ -1,15 +1,20 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_fonts.dart';
 
 class GlitchText extends StatefulWidget {
-  const GlitchText({super.key, required this.text, this.style});
+  const GlitchText({
+    super.key,
+    required this.text,
+    this.style,
+    this.centered = false,
+  });
 
   final String text;
   final TextStyle? style;
+  final bool centered;
 
   @override
   State<GlitchText> createState() => _GlitchTextState();
@@ -100,27 +105,46 @@ class _GlitchTextState extends State<GlitchText> {
     return RepaintBoundary(
       child: Stack(
         children: [
-          Opacity(opacity: 0, child: Text(widget.text, style: style)),
-
-          if (_glitching) _GhostLayer(
-            text: _displayed, style: style,
-            offset: const Offset(-2, 0),
-            color: Colors.red.withOpacity(0.22),
+          // hidden text for sizing
+          Opacity(
+            opacity: 0,
+            child: Text(
+              widget.text,
+              style: style,
+              textAlign: widget.centered ? TextAlign.center : TextAlign.left,
+            ),
           ),
 
-          if (_glitching) _GhostLayer(
-            text: _displayed, style: style,
-            offset: const Offset(2, 0),
-            color: Colors.blue.withOpacity(0.18),
-          ),
+          // ghost layers
+          if (_glitching)
+            _GhostLayer(
+              text: _displayed,
+              style: style,
+              offset: const Offset(-2, 0),
+              color: Colors.red.withOpacity(0.22),
+              centered: widget.centered,
+            ),
+          if (_glitching)
+            _GhostLayer(
+              text: _displayed,
+              style: style,
+              offset: const Offset(2, 0),
+              color: Colors.blue.withOpacity(0.18),
+              centered: widget.centered,
+            ),
 
+          // main displayed text
           Positioned.fill(
             child: IgnorePointer(
               child: OverflowBox(
-                alignment: Alignment.topLeft,
+                alignment: widget.centered ? Alignment.center : Alignment.topLeft,
                 maxWidth: double.infinity,
                 maxHeight: double.infinity,
-                child: Text(_displayed, style: style),
+                child: Text(
+                  _displayed,
+                  style: style,
+                  textAlign: widget.centered ? TextAlign.center : TextAlign.left,
+                ),
               ),
             ),
           ),
@@ -130,30 +154,37 @@ class _GlitchTextState extends State<GlitchText> {
   }
 }
 
+/// Ghost layer for glitch effect
 class _GhostLayer extends StatelessWidget {
   const _GhostLayer({
     required this.text,
     required this.style,
     required this.offset,
     required this.color,
+    required this.centered,
   });
 
   final String text;
   final TextStyle style;
   final Offset offset;
   final Color color;
+  final bool centered;
 
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: IgnorePointer(
         child: OverflowBox(
-          alignment: Alignment.topLeft,
+          alignment: centered ? Alignment.center : Alignment.topLeft,
           maxWidth: double.infinity,
           maxHeight: double.infinity,
           child: Transform.translate(
             offset: offset,
-            child: Text(text, style: style.copyWith(color: color)),
+            child: Text(
+              text,
+              style: style.copyWith(color: color),
+              textAlign: centered ? TextAlign.center : TextAlign.left,
+            ),
           ),
         ),
       ),

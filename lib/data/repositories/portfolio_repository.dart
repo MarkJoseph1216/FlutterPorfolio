@@ -177,7 +177,7 @@ abstract final class PortfolioRepository {
           'commuters with local tricycle drivers through a mobile-friendly system. '
           'The application enables users to book rides, view driver details, '
           'and experience a more convenient and organized transportation service.',
-      techStack: ['Kotlin', 'Compose', 'Room', 'MPAndroidChart'],
+      techStack: ['Laravel', 'Flutter', 'Dart'],
       category: ProjectCategory.freelance,
       thumbnailAsset: 'assets/thumbnails/traysitek.jpg',
       urlLink: 'https://traysikel.tech/',

@@ -83,38 +83,46 @@ class _MetaRow extends StatelessWidget {
 class _NameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isNarrow = MediaQuery.of(context).size.width < 600;
     final c = AppColors.of(context);
-    if (isNarrow) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+    final mobile = DeviceUtils.isMobile(context);
+
+    if (mobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
+          Center(
+            child: _ProfilePhoto(size: mobile ? 110 : 130),
+          ),
+          const SizedBox(height: 24),
+          Center(
             child: GlitchText(
               text: PortfolioRepository.nameDisplay,
+              centered: mobile,
               style: AppFonts.display(
-                  size: 62,
-                  color: c.textPrimary,
-                  letterSpacing: -2.5,
-                  height: 0.95),
+                size: mobile ? 56 : 68,
+                color: c.textPrimary,
+                letterSpacing: -2.5,
+                height: 0.95,
+              ),
             ).animate().fadeIn(delay: 200.ms, duration: 900.ms),
           ),
-          const SizedBox(width: 20),
-          const _ProfilePhoto(size: 150),
         ],
       );
     }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: GlitchText(
             text: PortfolioRepository.nameDisplay,
+            centered: mobile,
             style: AppFonts.display(
-                size: 96,
-                color: c.textPrimary,
-                letterSpacing: -4,
-                height: 0.92),
+              size: 96,
+              color: c.textPrimary,
+              letterSpacing: -4,
+              height: 0.92,
+            ),
           ).animate().fadeIn(delay: 200.ms, duration: 900.ms),
         ),
         const SizedBox(width: 36),
