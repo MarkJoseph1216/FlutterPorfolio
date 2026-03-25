@@ -64,7 +64,7 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
   static const _charDelay = Duration(milliseconds: 18);
   static const _lineDelay = Duration(milliseconds: 60);
 
-  late List<int> _visibleChars;
+  late final ValueNotifier<List<int>> _visibleChars;
 
   bool _triggered = false;
   ScrollController? _scrollCtrl;
@@ -72,7 +72,7 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
   @override
   void initState() {
     super.initState();
-    _visibleChars = List.filled(_lines.length, 0);
+    _visibleChars = ValueNotifier(List.filled(_lines.length, 0));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollCtrl = ScrollControllerProvider.of(context);
@@ -84,6 +84,7 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
   @override
   void dispose() {
     _scrollCtrl?.removeListener(_check);
+    _visibleChars.dispose();
     super.dispose();
   }
 
@@ -103,11 +104,12 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
   Future<void> _startTyping() async {
     for (var lineIdx = 0; lineIdx < _lines.length; lineIdx++) {
       await Future.delayed(_lineDelay);
-
       final fullLine = _lines[lineIdx].map((e) => e.$1).join();
       for (var charIdx = 1; charIdx <= fullLine.length; charIdx++) {
         if (!mounted) return;
-        setState(() => _visibleChars[lineIdx] = charIdx);
+        final updated = List<int>.from(_visibleChars.value);
+        updated[lineIdx] = charIdx;
+        _visibleChars.value = updated;
         await Future.delayed(_charDelay);
       }
     }
@@ -116,7 +118,6 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
   @override
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
-
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -128,20 +129,22 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
         children: [
           _WindowChrome(),
           const SizedBox(height: 4),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _lines.asMap().entries.map((entry) {
-                final lineIdx = entry.key;
-                final tokens = entry.value;
-                return _CodeLine(
-                  tokens: tokens,
-                  lineNumber: lineIdx + 1,
-                  visibleChars: _visibleChars[lineIdx],
+            child: ValueListenableBuilder<List<int>>(
+              valueListenable: _visibleChars,
+              builder: (context, chars, __) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: _lines.asMap().entries.map((entry) {
+                    return _CodeLine(
+                      tokens: entry.value,
+                      lineNumber: entry.key + 1,
+                      visibleChars: chars[entry.key],
+                    );
+                  }).toList(),
                 );
-              }).toList(),
+              },
             ),
           ),
         ],

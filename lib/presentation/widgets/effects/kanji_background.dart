@@ -3,13 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import '../../../core/constants/app_colors.dart';
 
-/// Korean Hangul characters drifting slowly upward.
-/// Throttled to ~20fps (10fps on mobile) via [Ticker].
-/// [TextPainter]s cached and rebuilt only on theme change.
 class KanjiBackground extends StatefulWidget {
   const KanjiBackground({super.key, this.reducedMode = false});
 
-  /// Fewer particles + slower tick on mobile.
   final bool reducedMode;
 
   @override
@@ -44,7 +40,7 @@ class _KanjiBackgroundState extends State<KanjiBackground>
 
   void _onTick(Duration elapsed) {
     final interval = widget.reducedMode
-        ? const Duration(milliseconds: 100)
+        ? const Duration(milliseconds: 200)
         : const Duration(milliseconds: 50);
     if (elapsed - _lastRepaint < interval) return;
     _lastRepaint = elapsed;

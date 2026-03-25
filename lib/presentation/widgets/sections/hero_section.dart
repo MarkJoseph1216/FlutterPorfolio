@@ -312,34 +312,35 @@ class _BioColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
+    final isMobile = DeviceUtils.isMobile(context);
+
+    if (isMobile) {
+      return Text(
+        PortfolioRepository.heroBio,
+        style: AppFonts.body(size: 14, color: c.textSecondary, height: 1.9),
+      ).animate().fadeIn(delay: 700.ms, duration: 500.ms);
+    }
+
     final words = PortfolioRepository.heroBio.split(' ');
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Wrap(
-        spacing: 4,
-        runSpacing: 2,
-        children: words.asMap().entries.map((e) {
-          final stepMs = (e.key * 28).clamp(0, 600);
-          return Text(e.value,
-                  style: AppFonts.body(
-                      size: 14, color: c.textSecondary, height: 1.9))
-              .animate()
-              .fadeIn(
-                  delay: Duration(milliseconds: 700 + stepMs), duration: 400.ms)
-              .slideY(
-                  begin: 0.4,
-                  end: 0,
-                  delay: Duration(milliseconds: 700 + stepMs),
-                  duration: 400.ms,
-                  curve: Curves.easeOutCubic);
-        }).toList(),
-      ),
-      const SizedBox(height: 28),
-      Row(children: [
-        _CtaButton(label: 'View Work', filled: true, onTap: onWorkTap),
-        const SizedBox(width: 12),
-        _CtaButton(label: 'Get in Touch', filled: false, onTap: onContactTap),
-      ]).animate().fadeIn(delay: 1200.ms, duration: 500.ms),
-    ]);
+    return Wrap(
+      spacing: 4,
+      runSpacing: 2,
+      children: words.asMap().entries.map((e) {
+        final stepMs = (e.key * 28).clamp(0, 600);
+        return Text(e.value,
+                style: AppFonts.body(
+                    size: 14, color: c.textSecondary, height: 1.9))
+            .animate()
+            .fadeIn(
+                delay: Duration(milliseconds: 700 + stepMs), duration: 400.ms)
+            .slideY(
+                begin: 0.4,
+                end: 0,
+                delay: Duration(milliseconds: 700 + stepMs),
+                duration: 400.ms,
+                curve: Curves.easeOutCubic);
+      }).toList(),
+    );
   }
 }
 

@@ -22,10 +22,6 @@ Future<void> _launchUrl(String url) async {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Section
-// ─────────────────────────────────────────────────────────────────────────────
-
 class WorkSection extends StatefulWidget {
   const WorkSection({super.key});
 

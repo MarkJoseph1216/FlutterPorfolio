@@ -14,10 +14,6 @@ import '../common/section_meta.dart';
 import '../common/section_wrapper.dart';
 import '../effects/brush_reveal.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Theme-aware cyberpunk accent
-// ─────────────────────────────────────────────────────────────────────────────
-
 Color _cyber(BuildContext context) => ThemeProvider.isDark(context)
     ? const Color(0xFF00FFFF)
     : const Color(0xFF007A7A);
@@ -26,20 +22,12 @@ Color _cyberGlow(BuildContext context) => ThemeProvider.isDark(context)
     ? const Color(0xFF00FFFF).withOpacity(0.06)
     : const Color(0xFF007A7A).withOpacity(0.06);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// URL helper
-// ─────────────────────────────────────────────────────────────────────────────
-
 Future<void> _launchUrl(String url) async {
   final uri = Uri.parse(url);
   if (await canLaunchUrl(uri)) {
     launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Glitch painter
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _GlitchPainter extends CustomPainter {
   const _GlitchPainter({
