@@ -243,12 +243,43 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
   }
 }
 
-class _ScreenWidget extends StatelessWidget {
-  const _ScreenWidget({super.key, required this.channel, required this.powered, required this.showStatic, required this.staticSeed, required this.scanlines});
+class _ScreenWidget extends StatefulWidget {
+  const _ScreenWidget({
+    required this.channel,
+    required this.powered,
+    required this.showStatic,
+    required this.staticSeed,
+    required this.scanlines,
+  });
   final ChannelModel channel;
   final bool powered, showStatic;
   final int staticSeed;
   final ui.Image? scanlines;
+
+  @override
+  State<_ScreenWidget> createState() => _ScreenWidgetState();
+}
+
+class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderStateMixin {
+  late Orientation _lastOrientation;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastOrientation = MediaQuery.of(context).orientation;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Check if orientation changed
+    final currentOrientation = MediaQuery.of(context).orientation;
+    if (_lastOrientation != currentOrientation) {
+      _lastOrientation = currentOrientation;
+      // Force rebuild when orientation changes
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -258,25 +289,28 @@ class _ScreenWidget extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             const ColoredBox(color: Color(0xFF020202)),
-            if (!showStatic) const ScreenKanjiBackground(),
-            if (powered && !showStatic)
-              ChannelContent(channel: channel),
-            if (!powered && !showStatic)
+            const ScreenKanjiBackground(),
+            if (widget.powered && !widget.showStatic)
+              ChannelContent(channel: widget.channel),
+            if (!widget.powered && !widget.showStatic)
               const Center(child: SizedBox(width: 3, height: 2, child: ColoredBox(color: Color(0x44ffffff)))),
-            if (showStatic)
+            if (widget.showStatic)
               RepaintBoundary(
                 child: CustomPaint(
-                  painter: _StaticPainter(seed: staticSeed),
+                  key: ValueKey('static_${widget.staticSeed}_${constraints.maxWidth}_${constraints.maxHeight}'),
+                  painter: _StaticPainter(
+                    seed: widget.staticSeed,
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                  ),
                   size: Size(constraints.maxWidth, constraints.maxHeight),
-                  isComplex: true,
-                  willChange: false,
                 ),
               ),
-            if (scanlines != null && !showStatic) // Only show scanlines when not static
+            if (widget.scanlines != null && !widget.showStatic)
               IgnorePointer(
                 child: RepaintBoundary(
                   child: CustomPaint(
-                    painter: _ScanlinePainter(image: scanlines!),
+                    painter: _ScanlinePainter(image: widget.scanlines!),
                     size: Size(constraints.maxWidth, constraints.maxHeight),
                   ),
                 ),
@@ -286,17 +320,17 @@ class _ScreenWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     radius: 1.15,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.5)], // Reduced from 0.78
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.5)],
                   ),
                 ),
               ),
             ),
-            if (powered && !showStatic)
+            if (widget.powered && !widget.showStatic)
               Positioned(
                 top: 10,
                 right: 14,
                 child: Text(
-                  'CH·0${channel.number}',
+                  'CH·0${widget.channel.number}',
                   style: AppFonts.tvChannel(color: const Color(0x2Effffff), size: 9, letterSpacing: 3),
                 ),
               ),
@@ -333,14 +367,21 @@ class _VSep extends StatelessWidget {
 }
 
 class _StaticPainter extends CustomPainter {
-  const _StaticPainter({required this.seed});
+  const _StaticPainter({
+    required this.seed,
+    required this.width,
+    required this.height,
+  });
   final int seed;
-  static final Map<int, ui.Image> _imageCache = {};
+  final double width;
+  final double height;
+
+  static final Map<String, ui.Image> _imageCache = {};
   static const px = 6.0;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cacheKey = seed;
+    final cacheKey = '${seed}_${width.toInt()}_${height.toInt()}';
 
     if (_imageCache.containsKey(cacheKey)) {
       canvas.drawImage(_imageCache[cacheKey]!, Offset.zero, Paint());
@@ -352,8 +393,8 @@ class _StaticPainter extends CustomPainter {
     final rng = math.Random(seed);
     final paint = Paint();
 
-    final cols = (size.width / px).ceil();
-    final rows = (size.height / px).ceil();
+    final cols = (width / px).ceil();
+    final rows = (height / px).ceil();
 
     for (int row = 0; row < rows; row++) {
       for (int col = 0; col < cols; col++) {
@@ -367,14 +408,16 @@ class _StaticPainter extends CustomPainter {
     }
 
     final picture = recorder.endRecording();
-    picture.toImage(size.width.toInt(), size.height.toInt()).then((image) {
+    picture.toImage(width.toInt(), height.toInt()).then((image) {
       _imageCache[cacheKey] = image;
     });
     canvas.drawPicture(picture);
   }
 
   @override
-  bool shouldRepaint(_StaticPainter old) => old.seed != seed;
+  bool shouldRepaint(_StaticPainter old) {
+    return old.seed != seed || old.width != width || old.height != height;
+  }
 }
 
 class _ScanlinePainter extends CustomPainter {
