@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_fonts.dart';
+import '../../../core/providers/theme_provider.dart';
 import '../../../data/models/channel_model.dart';
 import '../common/power_button.dart';
 import '../common/channel_button.dart';
-import 'retro_mobile_button.dart';
+import 'retro_radio_slider.dart';
 
 class MobileControls extends StatefulWidget {
   const MobileControls({
@@ -28,13 +29,31 @@ class MobileControls extends StatefulWidget {
 
 class _MobileControlsState extends State<MobileControls> {
   final ScrollController _scrollController = ScrollController();
+  final List<GlobalKey> _buttonKeys = [];
   bool _showLeftShadow = false;
   bool _showRightShadow = true;
+  bool _isAutoScrolling = false;
 
   @override
   void initState() {
     super.initState();
+    for (int i = 0; i < ChannelModel.values.length; i++) {
+      _buttonKeys.add(GlobalKey());
+    }
+
     _scrollController.addListener(_updateShadows);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentChannel();
+    });
+  }
+
+  @override
+  void didUpdateWidget(MobileControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.current != widget.current) {
+      _scrollToCurrentChannel();
+    }
   }
 
   @override
@@ -45,11 +64,32 @@ class _MobileControlsState extends State<MobileControls> {
   }
 
   void _updateShadows() {
-    if (!mounted) return;
+    if (!mounted || _isAutoScrolling) return;
     setState(() {
       _showLeftShadow = _scrollController.hasClients && _scrollController.offset > 5;
       _showRightShadow = _scrollController.hasClients &&
           _scrollController.offset < _scrollController.position.maxScrollExtent - 5;
+    });
+  }
+
+  void _scrollToCurrentChannel() {
+    if (!_scrollController.hasClients) return;
+
+    final currentIndex = ChannelModel.values.indexOf(widget.current);
+    if (currentIndex == -1) return;
+
+    const buttonWidth = 55.0;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scrollOffset = (currentIndex * buttonWidth) - (screenWidth / 2) + (buttonWidth / 2);
+
+    _isAutoScrolling = true;
+    _scrollController.animateTo(
+      scrollOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    ).then((_) {
+      _isAutoScrolling = false;
+      _updateShadows();
     });
   }
 
@@ -66,6 +106,7 @@ class _MobileControlsState extends State<MobileControls> {
             Expanded(
               child: Stack(
                 children: [
+                  // Left shadow indicator
                   if (_showLeftShadow)
                     Positioned(
                       left: 0,
@@ -86,6 +127,7 @@ class _MobileControlsState extends State<MobileControls> {
                       ),
                     ),
 
+                  // Right shadow indicator
                   if (_showRightShadow)
                     Positioned(
                       right: 0,
@@ -106,20 +148,28 @@ class _MobileControlsState extends State<MobileControls> {
                       ),
                     ),
 
+                  // Scrollable channel buttons
                   SingleChildScrollView(
                     controller: _scrollController,
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     child: Row(
-                      children: ChannelModel.values.map((ch) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: ChannelButton(
-                          channel: ch,
-                          active: widget.current == ch && widget.powered,
-                          onTap: () => widget.onChannel(ch),
-                          isDesktop: false,
-                        ),
-                      )).toList(),
+                      children: ChannelModel.values.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final ch = entry.value;
+                        final isActive = widget.current == ch && widget.powered;
+
+                        return Container(
+                          key: _buttonKeys[index],
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: ChannelButton(
+                            channel: ch,
+                            active: isActive,
+                            onTap: () => widget.onChannel(ch),
+                            isDesktop: false,
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ],
@@ -160,26 +210,10 @@ class _MobileControlsState extends State<MobileControls> {
             ),
           ),
 
-        // Prev/Next row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: RetroMobileButton(
-                label: 'PREV',
-                onTap: widget.onPrev,
-                isLeft: true,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: RetroMobileButton(
-                label: 'NEXT',
-                onTap: widget.onNext,
-                isLeft: false,
-              ),
-            ),
-          ],
+        RetroRadioSlider(
+          onPrev: widget.onPrev,
+          onNext: widget.onNext,
+          isDark: ThemeProvider.isDark(context),
         ),
       ],
     );
