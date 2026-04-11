@@ -54,7 +54,7 @@ class _IntroBodyState extends State<IntroBody> with SingleTickerProviderStateMix
               Text(PortfolioRepository.nameKr, style: AppFonts.tvRetro(color: colors.textMuted, size: isCompact ? 9 * fs : 11 * fs, letterSpacing: 5)),
               SizedBox(height: isCompact ? 3 * fs : 5 * fs),
               Text(PortfolioRepository.name, style: AppFonts.display(color: colors.textPrimary, size: isCompact ? 18 * fs : 22 * fs, letterSpacing: 1.5)),
-              SizedBox(height: isCompact ? 2 * fs : 4 * fs),
+              SizedBox(height: isCompact ? 8 * fs : 10 * fs),
               Text(PortfolioRepository.title.toUpperCase(), style: AppFonts.labelSmall(color: colors.textMuted, size: isCompact ? 7 * fs : 8 * fs, letterSpacing: 3)),
               if (!isCompact) ...[
                 SizedBox(height: 6 * fs),

@@ -28,6 +28,7 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
   ChannelModel _current = ChannelModel.intro;
   bool _powered = true;
   bool _busy = false;
+  bool _isFramePending = false;
 
   late final Ticker _ticker;
   bool _showStatic = false;
@@ -62,7 +63,14 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
 
   void _tick(Duration _) {
     if (!_showStatic) return;
-    setState(() => _frame++);
+    if (_isFramePending) return;
+
+    _isFramePending = true;
+    setState(() {
+      _frame++;
+      _isFramePending = false;
+    });
+
     if (_frame >= _targetFrames) {
       _ticker.stop();
       _showStatic = false;
@@ -120,22 +128,40 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
     final maxWidth = ScreenUtils.tvMaxWidth(context);
     final isDesktop = ScreenUtils.isDesktop(context);
     final isCompact = ScreenUtils.isCompactMobile(context);
+    final isTablet = ScreenUtils.isiPad(context);
     final isMobile = ScreenUtils.isMobile(context);
+    final screenWidth = MediaQuery.of(context).size.width;
 
-    // Use Center to center the entire TV component
-    return Center(
+    final horizontalPadding = screenWidth > maxWidth ? (screenWidth - maxWidth) / 2 : 0.0;
+
+    double bottomMargin = 0;
+    if (isDesktop) {
+      bottomMargin = 24;
+    } else if (isTablet) {
+      bottomMargin = 16;
+    } else {
+      bottomMargin = 8;
+    }
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: SizedBox(
         width: maxWidth,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 16),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [ModeToggle()],
+            SizedBox(height: isMobile ? 24 : 16),
+            Padding(
+              padding: EdgeInsets.only(right: isMobile ? 8 : 0),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [ModeToggle()],
+              ),
             ),
 
-            if (!isCompact) const _AntennaWidget(),
+            SizedBox(height: isMobile ? 8 : 0),
+
+            const _AntennaWidget(),
             if (!isCompact) const SizedBox(height: 1),
 
             // TV Body
@@ -168,13 +194,13 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
                 if (!isCompact) ...[
                   const SizedBox(height: 12),
                   DesktopInfoBar(current: _current, powered: _powered),
-                  const SizedBox(height: 8),
-                  AnimatedDefaultTextStyle(
-                    duration: const Duration(milliseconds: 500),
-                    style: AppFonts.tvRetro(color: colors.textMuted, size: isDesktop ? 8 : 7, letterSpacing: 3),
-                    child: const Text('KDRAMA  ·  GOALS  ·  한국 드라마'),
-                  ),
                 ],
+                const SizedBox(height: 8),
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 500),
+                  style: AppFonts.tvRetro(color: colors.textMuted, size: isDesktop ? 8 : 7, letterSpacing: 3),
+                  child: const Text('ANDROID  ·  GOALS  ·  한국 드라마'),
+                ),
               ]),
             ),
 
@@ -208,6 +234,8 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
                 KnobWidget(label: 'NEXT', turns: _nextTurns, onTap: _next, isDesktop: isDesktop),
               ]),
             ),
+
+            SizedBox(height: bottomMargin),
           ],
         ),
       ),
@@ -216,7 +244,7 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
 }
 
 class _ScreenWidget extends StatelessWidget {
-  const _ScreenWidget({required this.channel, required this.powered, required this.showStatic, required this.staticSeed, required this.scanlines});
+  const _ScreenWidget({super.key, required this.channel, required this.powered, required this.showStatic, required this.staticSeed, required this.scanlines});
   final ChannelModel channel;
   final bool powered, showStatic;
   final int staticSeed;
@@ -224,23 +252,58 @@ class _ScreenWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('_ScreenWidget: powered=$powered, showStatic=$showStatic, channel=${channel.en}');
-    return Stack(fit: StackFit.expand, children: [
-      const ColoredBox(color: Color(0xFF020202)),
-      const ScreenKanjiBackground(),
-      if (powered && !showStatic)
-        ChannelContent(channel: channel),
-      if (!powered && !showStatic)
-        const Center(child: SizedBox(width: 3, height: 2, child: ColoredBox(color: Color(0x44ffffff)))),
-      if (showStatic)
-        RepaintBoundary(child: CustomPaint(painter: _StaticPainter(seed: staticSeed))),
-      if (scanlines != null)
-        IgnorePointer(child: RepaintBoundary(child: CustomPaint(painter: _ScanlinePainter(image: scanlines!)))),
-      IgnorePointer(child: DecoratedBox(decoration: BoxDecoration(gradient: RadialGradient(radius: 1.15, colors: [Colors.transparent, Colors.black.withOpacity(0.78)])))),
-      IgnorePointer(child: DecoratedBox(decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), boxShadow: const [BoxShadow(color: Color(0x0C8b0000), blurRadius: 40)]))),
-      if (powered && !showStatic)
-        Positioned(top: 10, right: 14, child: Text('CH·0${channel.number}', style: AppFonts.tvChannel(color: const Color(0x2Effffff), size: 9, letterSpacing: 3))),
-    ]);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            const ColoredBox(color: Color(0xFF020202)),
+            if (!showStatic) const ScreenKanjiBackground(),
+            if (powered && !showStatic)
+              ChannelContent(channel: channel),
+            if (!powered && !showStatic)
+              const Center(child: SizedBox(width: 3, height: 2, child: ColoredBox(color: Color(0x44ffffff)))),
+            if (showStatic)
+              RepaintBoundary(
+                child: CustomPaint(
+                  painter: _StaticPainter(seed: staticSeed),
+                  size: Size(constraints.maxWidth, constraints.maxHeight),
+                  isComplex: true,
+                  willChange: false,
+                ),
+              ),
+            if (scanlines != null && !showStatic) // Only show scanlines when not static
+              IgnorePointer(
+                child: RepaintBoundary(
+                  child: CustomPaint(
+                    painter: _ScanlinePainter(image: scanlines!),
+                    size: Size(constraints.maxWidth, constraints.maxHeight),
+                  ),
+                ),
+              ),
+            IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    radius: 1.15,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.5)], // Reduced from 0.78
+                  ),
+                ),
+              ),
+            ),
+            if (powered && !showStatic)
+              Positioned(
+                top: 10,
+                right: 14,
+                child: Text(
+                  'CH·0${channel.number}',
+                  style: AppFonts.tvChannel(color: const Color(0x2Effffff), size: 9, letterSpacing: 3),
+                ),
+              ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -273,27 +336,40 @@ class _StaticPainter extends CustomPainter {
   const _StaticPainter({required this.seed});
   final int seed;
   static final Map<int, ui.Image> _imageCache = {};
+  static const px = 6.0;
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (_imageCache.containsKey(seed)) {
-      canvas.drawImage(_imageCache[seed]!, Offset.zero, Paint());
+    final cacheKey = seed;
+
+    if (_imageCache.containsKey(cacheKey)) {
+      canvas.drawImage(_imageCache[cacheKey]!, Offset.zero, Paint());
       return;
     }
+
     final recorder = ui.PictureRecorder();
     final paintCanvas = Canvas(recorder);
-    const px = 4.0;
     final rng = math.Random(seed);
     final paint = Paint();
-    for (double y = 0; y < size.height; y += px) {
-      for (double x = 0; x < size.width; x += px) {
+
+    final cols = (size.width / px).ceil();
+    final rows = (size.height / px).ceil();
+
+    for (int row = 0; row < rows; row++) {
+      for (int col = 0; col < cols; col++) {
         final v = rng.nextInt(165);
         paint.color = Color.fromRGBO(v, (v * 0.87).round(), (v * 0.80).round(), 1);
-        paintCanvas.drawRect(Rect.fromLTWH(x, y, px, px), paint);
+        paintCanvas.drawRect(
+          Rect.fromLTWH(col * px, row * px, px, px),
+          paint,
+        );
       }
     }
+
     final picture = recorder.endRecording();
-    picture.toImage(size.width.toInt(), size.height.toInt()).then((image) => _imageCache[seed] = image);
+    picture.toImage(size.width.toInt(), size.height.toInt()).then((image) {
+      _imageCache[cacheKey] = image;
+    });
     canvas.drawPicture(picture);
   }
 

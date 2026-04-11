@@ -2,30 +2,41 @@ import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
 
 class ScreenUtils {
+  static const double desktopBreakpoint = 1024;
+  static const double tabletBreakpoint = 640;
+  static const double compactBreakpoint = 480;
+
   static bool isDesktop(BuildContext context) =>
-      MediaQuery.sizeOf(context).width >= AppConstants.desktopBreakpoint;
+      MediaQuery.sizeOf(context).width >= desktopBreakpoint;
 
   static bool isTablet(BuildContext context) =>
-      MediaQuery.sizeOf(context).width >= AppConstants.tabletBreakpoint;
+      MediaQuery.sizeOf(context).width >= tabletBreakpoint &&
+          MediaQuery.sizeOf(context).width < desktopBreakpoint;
 
   static bool isMobile(BuildContext context) =>
-      MediaQuery.sizeOf(context).width < AppConstants.tabletBreakpoint;
+      MediaQuery.sizeOf(context).width < tabletBreakpoint;
 
   static bool isCompactMobile(BuildContext context) =>
-      MediaQuery.sizeOf(context).width < AppConstants.compactBreakpoint;
+      MediaQuery.sizeOf(context).width < compactBreakpoint;
+
+  static bool isiPad(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
+    return (width == 768 && height == 1024) ||
+        (width == 810 && height == 1080) ||
+        (width == 834 && height == 1194) ||
+        (width == 1024 && height == 1366) ||
+        (width >= 768 && width < 1024 &&
+            (height / width).toStringAsFixed(2) == "1.33");
+  }
 
   static double tvMaxWidth(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    if (size.width >= AppConstants.desktopBreakpoint) {
-      final fromHeight = (size.height - 200) * AppConstants.tvAspectRatio;
-      return fromHeight.clamp(
-        AppConstants.tvDesktopMinWidth,
-        AppConstants.tvDesktopMaxWidth,
-      );
+    if (isDesktop(context)) {
+      final fromHeight = (size.height - 200) * (4 / 3);
+      return fromHeight.clamp(900.0, 1200.0);
     }
-    if (size.width >= AppConstants.tabletBreakpoint) {
-      return AppConstants.tvTabletWidth;
-    }
+    if (isTablet(context)) return 560.0;
     return size.width - 24;
   }
 

@@ -22,9 +22,9 @@ class AboutBody extends StatelessWidget {
         SizedBox(height: isCompact ? 6 * fs : 24 * fs),
         _InfoGrid(
           cells: [
-            _InfoCell('위치 · BASED', PortfolioRepository.location),
-            _InfoCell('경험 · EXP', PortfolioRepository.experience),
-            _InfoCell('집중 · FOCUS', 'Android · Flutter'),
+            const _InfoCell('위치 · BASED', PortfolioRepository.location),
+            const _InfoCell('경험 · EXP', PortfolioRepository.experience),
+            const _InfoCell('집중 · FOCUS', 'Android · Flutter'),
             _InfoCell('상태 · STATUS', '● Available', valueColor: colors.tvPowerOn),
           ],
           fs: fs,

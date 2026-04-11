@@ -3,9 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'dart:js' as js;
 
 import 'core/providers/theme_provider.dart';
+import 'core/utils/screen_utils.dart';
 import 'presentation/screens/home/tv_portfolio_screen.dart';
 
 void main() {
+  if (kIsWeb) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
+
   runApp(const PortfolioApp());
 }
 
@@ -23,7 +28,6 @@ class _PortfolioAppState extends State<PortfolioApp> {
   @override
   void initState() {
     super.initState();
-    // Simulate loading
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
@@ -55,11 +59,12 @@ class _PortfolioAppState extends State<PortfolioApp> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ScreenUtils.isMobile(context);
     if (_isLoading) {
-      return const MaterialApp(
+      return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
-          backgroundColor: Color(0xFF0C0C0C),
+          backgroundColor: const Color(0xFF0C0C0C),
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -67,13 +72,13 @@ class _PortfolioAppState extends State<PortfolioApp> {
                 Text(
                   '안녕하세요',
                   style: TextStyle(
-                    fontSize: 76,
-                    color: Color(0xFFe8e8e8),
+                    fontSize: isMobile ? 48 : 76,
+                    color: const Color(0xFFe8e8e8),
                     fontWeight: FontWeight.w300,
                   ),
                 ),
-                SizedBox(height: 24),
-                SizedBox(
+                const SizedBox(height: 24),
+                const SizedBox(
                   width: 120,
                   height: 2,
                   child: LinearProgressIndicator(
@@ -81,8 +86,8 @@ class _PortfolioAppState extends State<PortfolioApp> {
                     valueColor: AlwaysStoppedAnimation(Color(0xFFdcb4b4)),
                   ),
                 ),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   'CHANNEL · SCANNING',
                   style: TextStyle(
                     fontFamily: 'Courier',

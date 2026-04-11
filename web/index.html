@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Mark Joseph — Mobile Developer Portfolio">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Mark Joseph">
@@ -14,13 +14,52 @@
   <link rel="preload" href="canvaskit/canvaskit.js" as="script">
   <link rel="preload" href="canvaskit/canvaskit.wasm" as="fetch" crossorigin="anonymous">
   <style>
+    /* Performance optimizations */
+    * {
+      -webkit-overflow-scrolling: touch;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       background-color: #0C0C0C;
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
+    /* Improve scroll performance on iOS/iPad */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Hardware acceleration for smoother scrolling */
+    .scrollable {
+      transform: translateZ(0);
+      will-change: scroll-position;
+      backface-visibility: hidden;
+    }
+
+    /* Loading animation */
     #loader {
       position: fixed;
       inset: 0;
@@ -53,6 +92,17 @@
       0%, 100% { opacity: 0.2; transform: scale(0.8); }
       50%       { opacity: 1;   transform: scale(1.2); }
     }
+
+    /* Prevent pull-to-refresh on iOS */
+    body {
+      overscroll-behavior: none;
+    }
+
+    /* Optimize canvas rendering */
+    canvas {
+      will-change: transform;
+      transform: translateZ(0);
+    }
   </style>
 </head>
 <body>
@@ -65,13 +115,34 @@
 
 <script>
   const ua = navigator.userAgent.toLowerCase();
-  const isMobile = /iphone|ipad|ipod|android|windows phone|mobile/.test(ua)
-    || navigator.maxTouchPoints > 1;
+  const isMobile = /iphone|ipad|ipod|android|windows phone|mobile/.test(ua) || navigator.maxTouchPoints > 1;
   const isSafari = /safari/.test(ua) && !/chrome|chromium|edg/.test(ua);
+  const isLowEndDevice = /iphone [6-8]|ipad [4-6]|android [7-9]/.test(ua);
 
-   window.flutterConfiguration = {
-    renderer: 'canvaskit'
+  window.flutterConfiguration = {
+    renderer: 'canvaskit',
+    canvasKitBaseUrl: '/canvaskit/',
+    useSkwasm: !isLowEndDevice,
+    preferWebgl: !isSafari,
   };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('scrollable');
+
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const loader = document.getElementById('loader');
+        if (loader) {
+          loader.classList.add('hide');
+          setTimeout(function() {
+            if (loader && loader.parentNode) {
+              loader.parentNode.removeChild(loader);
+            }
+          }, 500);
+        }
+      }, 100);
+    });
+  });
 </script>
 <script src="flutter_bootstrap.js" defer></script>
 <script>

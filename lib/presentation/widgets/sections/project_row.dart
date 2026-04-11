@@ -32,6 +32,7 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
   bool _expanded = false;
   late final AnimationController _expandCtrl;
   late final Animation<double> _expandAnim;
+  bool _hasImageError = false;
 
   @override
   void initState() {
@@ -59,6 +60,73 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
     }
   }
 
+  Widget _buildThumbnail() {
+    final colors = AppColors.of(context);
+    final isCompact = ScreenUtils.isCompactMobile(context);
+    final size = isCompact ? 50 * widget.fs : 70 * widget.fs;
+
+    if (widget.thumbnailAsset != null && !_hasImageError) {
+      return Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: colors.tvAccent.withOpacity(0.3), width: 1),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(5),
+          child: Image.asset(
+            widget.thumbnailAsset!,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && !_hasImageError) {
+                  setState(() => _hasImageError = true);
+                }
+              });
+              return _buildPlaceholder(size, colors);
+            },
+          ),
+        ),
+      );
+    }
+
+    return _buildPlaceholder(size, colors);
+  }
+
+  Widget _buildPlaceholder(double size, dynamic colors) {
+    final isCompact = ScreenUtils.isCompactMobile(context);
+    final firstLetter = widget.title.isNotEmpty ? widget.title[0].toUpperCase() : 'P';
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colors.tvAccent.withOpacity(0.25),
+            colors.tvAccent.withOpacity(0.08),
+          ],
+        ),
+        border: Border.all(color: colors.tvAccent.withOpacity(0.3), width: 1),
+      ),
+      child: Center(
+        child: Text(
+          firstLetter,
+          style: TextStyle(
+            fontFamily: 'Georgia',
+            fontSize: isCompact ? 24 : 32,
+            fontWeight: FontWeight.bold,
+            color: colors.tvAccent.withOpacity(0.6),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
@@ -84,29 +152,9 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Thumbnail image if available
-                  if (widget.thumbnailAsset != null) ...[
-                    Container(
-                      width: isCompact ? 50 * fs : 70 * fs,
-                      height: isCompact ? 50 * fs : 70 * fs,
-                      margin: EdgeInsets.only(right: 12 * fs),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: colors.tvAccent.withOpacity(0.3), width: 1),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(5),
-                        child: Image.asset(
-                          widget.thumbnailAsset!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: colors.surfaceAlt,
-                            child: Icon(Icons.image_not_supported, size: 20, color: colors.textMuted),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  _buildThumbnail(),
+
+                  const SizedBox(width: 12),
 
                   // Content
                   Expanded(
