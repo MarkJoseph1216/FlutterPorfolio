@@ -20,6 +20,11 @@ abstract final class AppColors {
     textSecondary: Color(0x70F2EDE4),
     textMuted: Color(0x38F2EDE4),
     textGhost: Color(0x18F2EDE4),
+    tvAccent: Color(0xFF8b0000),
+    tvAccentLight: Color(0xFFdcb4b4),
+    tvPowerOn: Color(0xFF1a4a1a),
+    tvPowerOff: Color(0xFF161616),
+    tvScanline: Color(0x15000000),
   );
 
   static const _ColorSet light = _ColorSet(
@@ -36,6 +41,11 @@ abstract final class AppColors {
     textSecondary: Color(0x881A1714),
     textMuted: Color(0x551A1714),
     textGhost: Color(0x221A1714),
+    tvAccent: Color(0xFF8b0000),
+    tvAccentLight: Color(0xFFdcb4b4),
+    tvPowerOn: Color(0xFF1a4a1a),
+    tvPowerOff: Color(0xFFe0d9cc),
+    tvScanline: Color(0x15000000),
   );
 }
 
@@ -55,6 +65,11 @@ class _ColorSet {
     required this.textSecondary,
     required this.textMuted,
     required this.textGhost,
+    required this.tvAccent,
+    required this.tvAccentLight,
+    required this.tvPowerOn,
+    required this.tvPowerOff,
+    required this.tvScanline,
   });
 
   final Color background;
@@ -70,4 +85,9 @@ class _ColorSet {
   final Color textSecondary;
   final Color textMuted;
   final Color textGhost;
+  final Color tvAccent;
+  final Color tvAccentLight;
+  final Color tvPowerOn;
+  final Color tvPowerOff;
+  final Color tvScanline;
 }

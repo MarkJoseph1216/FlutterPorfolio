@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_fonts.dart';
-import '../../../core/constants/app_layout.dart';
+import '../../../core/utils/screen_utils.dart';
 import '../../../data/repositories/portfolio_repository.dart';
 
 class FooterSection extends StatelessWidget {
@@ -10,18 +9,44 @@ class FooterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
+    final colors = AppColors.of(context);
+    final isMobile = ScreenUtils.isMobile(context);
+
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(border: Border(top: BorderSide(color: c.border))),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-      child: AppLayout.centered(
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('© 2019 ${PortfolioRepository.name}',
-              style: AppFonts.mono(size: 14, color: c.textMuted)),
-          Text('All rights reserved.',
-              style: AppFonts.mono(size: 14, color: c.textMuted)),
-        ]),
+      margin: EdgeInsets.only(top: isMobile ? 20 : 40),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.border)),
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16 : 24,
+        vertical: isMobile ? 20 : 28,
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '© 2019 ${PortfolioRepository.name}',
+              textAlign: TextAlign.center,
+              style: AppFonts.tvRetro(
+                color: colors.textMuted,
+                size: isMobile ? 10 : 12,
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'All rights reserved.',
+              textAlign: TextAlign.center,
+              style: AppFonts.tvRetro(
+                color: colors.textMuted,
+                size: isMobile ? 10 : 12,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
