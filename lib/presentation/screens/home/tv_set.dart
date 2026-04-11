@@ -15,6 +15,7 @@ import '../../widgets/common/knob_widget.dart';
 import '../../widgets/sections/desktop_info_bar.dart';
 import '../../widgets/sections/mobile_controls.dart';
 import '../../widgets/background/screen_kanji_background.dart';
+import '../../widgets/sections/mobile_info_bar.dart';
 import '../channels/channel_content.dart';
 
 class TvSet extends StatefulWidget {
@@ -194,6 +195,9 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
                 if (!isCompact) ...[
                   const SizedBox(height: 12),
                   DesktopInfoBar(current: _current, powered: _powered),
+                ] else if (isMobile) ...[
+                  const SizedBox(height: 8),
+                  MobileInfoBar(current: _current, powered: _powered),
                 ],
                 const SizedBox(height: 8),
                 AnimatedDefaultTextStyle(
