@@ -23,7 +23,7 @@ class _ChatWidgetState extends State<ChatWidget> {
   void initState() {
     super.initState();
     _messages.add(ChatMessage(
-      text: "Hello! 👋 I'm your AI assistant. Ask me anything about Mark's skills, experience, or projects! I speak English and Tagalog.",
+      text: "Hello! 👋 I'm your assistant. Ask me anything about Mark's skills, experience, or projects! I speak English and Tagalog.",
       isUser: false,
     ));
   }
