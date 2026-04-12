@@ -25,6 +25,16 @@ abstract final class AppColors {
     tvPowerOn: Color(0xFF1a4a1a),
     tvPowerOff: Color(0xFF161616),
     tvScanline: Color(0x15000000),
+
+    // Live code block colors.
+    syntaxKeyword: Color(0xFFCF8EF4),
+    syntaxType: Color(0xFF7ECFFF),
+    syntaxVariable: Color(0xFFF8B960),
+    syntaxString: Color(0xFF98C379),
+    syntaxNumber: Color(0xFFD19A66),
+    syntaxComment: Color(0x88ffffff),
+    syntaxPunct: Color(0x66ffffff),
+    syntaxPlain: Color(0x88ffffff),
   );
 
   static const _ColorSet light = _ColorSet(
@@ -46,6 +56,16 @@ abstract final class AppColors {
     tvPowerOn: Color(0xFF1a4a1a),
     tvPowerOff: Color(0xFFe0d9cc),
     tvScanline: Color(0x15000000),
+
+    // Live code block colors.
+    syntaxKeyword: Color(0xFF9B59B6),
+    syntaxType: Color(0xFF2980B9),
+    syntaxVariable: Color(0xFFD35400),
+    syntaxString: Color(0xFF27AE60),
+    syntaxNumber: Color(0xFFE67E22),
+    syntaxComment: Color(0x881a1a1a),
+    syntaxPunct: Color(0x661a1a1a),
+    syntaxPlain: Color(0x881a1a1a),
   );
 }
 
@@ -70,6 +90,14 @@ class _ColorSet {
     required this.tvPowerOn,
     required this.tvPowerOff,
     required this.tvScanline,
+    required this.syntaxKeyword,
+    required this.syntaxType,
+    required this.syntaxVariable,
+    required this.syntaxString,
+    required this.syntaxNumber,
+    required this.syntaxComment,
+    required this.syntaxPunct,
+    required this.syntaxPlain,
   });
 
   final Color background;
@@ -90,4 +118,14 @@ class _ColorSet {
   final Color tvPowerOn;
   final Color tvPowerOff;
   final Color tvScanline;
+
+  // Live code block colors.
+  final Color syntaxKeyword;
+  final Color syntaxType;
+  final Color syntaxVariable;
+  final Color syntaxString;
+  final Color syntaxNumber;
+  final Color syntaxComment;
+  final Color syntaxPunct;
+  final Color syntaxPlain;
 }

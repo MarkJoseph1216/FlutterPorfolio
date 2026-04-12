@@ -32,6 +32,7 @@ class EmailService {
             'subject': 'Portfolio Contact from $name',
             'to_email': _recipientEmail,
             'received_date': DateTime.now().toLocal().toString().split('.')[0],
+            'portfolio_link': 'https://imrkjoseph16-portfolio.vercel.app',
           },
         }),
       );

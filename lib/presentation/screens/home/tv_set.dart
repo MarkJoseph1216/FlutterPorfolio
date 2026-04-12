@@ -154,9 +154,9 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
             SizedBox(height: isMobile ? 24 : 16),
             Padding(
               padding: EdgeInsets.only(right: isMobile ? 8 : 0),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [ModeToggle()],
+              child: const Align(
+                alignment: Alignment.center,
+                child: ModeToggle(),
               ),
             ),
 

@@ -24,7 +24,9 @@ class _TvPortfolioScreenState extends State<TvPortfolioScreen> {
     if (!_hasShownSnackbar && ScreenUtils.isMobile(context)) {
       _hasShownSnackbar = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showDesktopSuggestion();
+        if (mounted) {
+          _showDesktopSuggestion();
+        }
       });
     }
   }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_fonts.dart';
-import '../../../core/utils/screen_utils.dart';
+import '../../../core/providers/theme_provider.dart';
 import '../../../data/repositories/portfolio_repository.dart';
 
 class LiveCodeBlock extends StatefulWidget {
@@ -59,16 +58,17 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
     super.dispose();
   }
 
-  Color _tokenColor(String role) {
+  Color _getTokenColor(String role, BuildContext context) {
+    final colors = ThemeProvider.isDark(context) ? AppColors.dark : AppColors.light;
     switch (role) {
-      case 'keyword': return const Color(0xFFCF8EF4);
-      case 'type': return const Color(0xFF7ECFFF);
-      case 'variable': return const Color(0xFFF9CF89);
-      case 'string': return const Color(0xFF98C379);
-      case 'number': return const Color(0xFFD19A66);
-      case 'comment': return const Color(0x55ffffff);
-      case 'punct': return const Color(0x44ffffff);
-      default: return const Color(0x88ffffff);
+      case 'keyword': return colors.syntaxKeyword;
+      case 'type': return colors.syntaxType;
+      case 'variable': return colors.syntaxVariable;
+      case 'string': return colors.syntaxString;
+      case 'number': return colors.syntaxNumber;
+      case 'comment': return colors.syntaxComment;
+      case 'punct': return colors.syntaxPunct;
+      default: return colors.syntaxPlain;
     }
   }
 
@@ -97,7 +97,7 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
               SizedBox(width: isCompact ? 3 * fs : 5 * fs),
               _TrafficDot(color: const Color(0xFF28C840), fs: fs, isCompact: isCompact),
               SizedBox(width: isCompact ? 8 * fs : 12 * fs),
-              Flexible(child: Text('about.dart', overflow: TextOverflow.ellipsis, style: AppFonts.code(color: colors.textMuted, size: isCompact ? 7 * fs : 8 * fs))),
+              Flexible(child: Text('about.dart', overflow: TextOverflow.ellipsis, style: AppFonts.code(color: colors.textSecondary, size: isCompact ? 7 * fs : 8 * fs))),
             ]),
           ),
           SingleChildScrollView(
@@ -117,7 +117,13 @@ class _LiveCodeBlockState extends State<LiveCodeBlock> {
                   for (final (text, role) in tokens) {
                     if (remaining <= 0) break;
                     final vis = text.substring(0, remaining.clamp(0, text.length));
-                    spans.add(TextSpan(text: vis, style: AppFonts.code(color: _tokenColor(role), size: isCompact ? 8 * fs : 9 * fs)));
+                    spans.add(TextSpan(
+                        text: vis,
+                        style: AppFonts.code(
+                            color: _getTokenColor(role, context),
+                            size: isCompact ? 8 * fs : 9 * fs
+                        )
+                    ));
                     remaining -= text.length;
                   }
                   if (isTyping) spans.add(WidgetSpan(child: _CursorBlink(fs: fs, isCompact: isCompact)));
@@ -172,11 +178,17 @@ class _CursorBlinkState extends State<_CursorBlink> with SingleTickerProviderSta
   }
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (_, __) => Opacity(
         opacity: _ctrl.value > 0.5 ? 1.0 : 0.0,
-        child: Container(width: 1.5 * widget.fs, height: widget.isCompact ? 8 * widget.fs : 10 * widget.fs, color: const Color(0xCCe8e8e8), margin: const EdgeInsets.only(left: 1)),
+        child: Container(
+            width: 1.5 * widget.fs,
+            height: widget.isCompact ? 8 * widget.fs : 10 * widget.fs,
+            color: colors.textSecondary,
+            margin: const EdgeInsets.only(left: 1)
+        ),
       ),
     );
   }

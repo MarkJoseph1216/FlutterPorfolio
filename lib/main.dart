@@ -118,7 +118,7 @@ class _PortfolioAppState extends State<PortfolioApp> {
                   : const Color(0xFFF7F4EF),
               useMaterial3: true,
             ),
-            home: TvPortfolioScreen(key: ValueKey(_theme.isDark)),
+            home: const TvPortfolioScreen(),
           );
         },
       ),
