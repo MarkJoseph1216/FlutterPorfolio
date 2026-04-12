@@ -28,7 +28,14 @@ class _ChatWidgetState extends State<ChatWidget> {
     ));
   }
 
-  Future<void> _sendMessage() async {
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
@@ -38,11 +45,39 @@ class _ChatWidgetState extends State<ChatWidget> {
       _isLoading = true;
     });
 
-    final response = StaticResponseService.getResponse(text);
+    _scrollToBottom();
 
-    setState(() {
-      _messages.add(ChatMessage(text: response, isUser: false));
-      _isLoading = false;
+    int delayMs = 500;
+    if (text.contains('?') && text.length > 30) {
+      delayMs = 1200;
+    } else if (text.length > 50) {
+      delayMs = 1000;
+    } else if (text.length > 20) {
+      delayMs = 700;
+    }
+
+    Future.delayed(Duration(milliseconds: delayMs), () {
+      final response = StaticResponseService.getResponse(text);
+
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(text: response, isUser: false));
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      }
+    });
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 
@@ -50,10 +85,18 @@ class _ChatWidgetState extends State<ChatWidget> {
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
     final isMobile = MediaQuery.of(context).size.width < 640;
+    final isCompact = MediaQuery.of(context).size.width < 480;
+
+    final chatHeight = isCompact ? 380.0 : (isMobile ? 420.0 : 500.0);
+    final inputPadding = isCompact ? 8.0 : 12.0;
+    final fontSize = isCompact ? 10.0 : 11.0;
+    final bubblePadding = isCompact ? 8.0 : 12.0;
+    final iconSize = isCompact ? 12.0 : 14.0;
+    final buttonPadding = isCompact ? 6.0 : 8.0;
 
     return Container(
-      width: isMobile ? double.infinity : 380,
-      height: isMobile ? 450 : 500,
+      width: double.infinity,
+      height: chatHeight,
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -82,14 +125,16 @@ class _ChatWidgetState extends State<ChatWidget> {
                 return _MessageBubble(
                   text: message.text,
                   isUser: message.isUser,
+                  bubblePadding: bubblePadding,
+                  fontSize: fontSize,
                 );
               },
             ),
           ),
 
-          // Input
+          // Input area
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(inputPadding),
             decoration: BoxDecoration(
               border: Border(top: BorderSide(color: colors.border)),
             ),
@@ -98,10 +143,10 @@ class _ChatWidgetState extends State<ChatWidget> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    style: AppFonts.label(color: colors.textPrimary, size: 11),
+                    style: AppFonts.label(color: colors.textPrimary, size: fontSize),
                     decoration: InputDecoration(
-                      hintText: 'Ask me anything... (English/Tagalog)',
-                      hintStyle: AppFonts.label(color: colors.textMuted, size: 11),
+                      hintText: isCompact ? 'Ask me...' : 'Ask me anything... (English/Tagalog)',
+                      hintStyle: AppFonts.label(color: colors.textMuted, size: fontSize),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                     ),
@@ -111,12 +156,12 @@ class _ChatWidgetState extends State<ChatWidget> {
                 GestureDetector(
                   onTap: _sendMessage,
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(buttonPadding),
                     decoration: BoxDecoration(
                       color: colors.tvAccent,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.send, size: 14, color: Colors.white),
+                    child: Icon(Icons.send, size: iconSize, color: Colors.white),
                   ),
                 ),
               ],
@@ -136,9 +181,16 @@ class ChatMessage {
 }
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.text, required this.isUser});
+  const _MessageBubble({
+    required this.text,
+    required this.isUser,
+    required this.bubblePadding,
+    required this.fontSize,
+  });
   final String text;
   final bool isUser;
+  final double bubblePadding;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -148,9 +200,9 @@ class _MessageBubble extends StatelessWidget {
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: bubblePadding, vertical: bubblePadding - 2),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.7,
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
           color: isUser ? colors.tvAccent : colors.surfaceAlt,
@@ -160,7 +212,7 @@ class _MessageBubble extends StatelessWidget {
           text,
           style: AppFonts.label(
             color: isUser ? Colors.white : colors.textPrimary,
-            size: 12,
+            size: fontSize,
           ),
         ),
       ),
@@ -174,6 +226,8 @@ class _TypingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
+    final isCompact = MediaQuery.of(context).size.width < 480;
+    final fontSize = isCompact ? 10.0 : 11.0;
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -184,66 +238,25 @@ class _TypingIndicator extends StatelessWidget {
           color: colors.surfaceAlt,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _Dot(delay: 0),
-            SizedBox(width: 4),
-            _Dot(delay: 200),
-            SizedBox(width: 4),
-            _Dot(delay: 400),
+            SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colors.tvAccent,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Typing...',
+              style: AppFonts.label(color: colors.textSecondary, size: fontSize),
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Dot extends StatefulWidget {
-  const _Dot({this.delay = 0});
-  final int delay;
-
-  @override
-  State<_Dot> createState() => _DotState();
-}
-
-class _DotState extends State<_Dot> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.repeat(reverse: true);
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppColors.of(context);
-
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return Container(
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: colors.textSecondary.withOpacity(0.5 + _controller.value * 0.5),
-          ),
-        );
-      },
     );
   }
 }

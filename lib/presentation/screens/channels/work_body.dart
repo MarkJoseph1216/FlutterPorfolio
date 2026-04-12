@@ -14,7 +14,7 @@ class WorkBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
     final isCompact = ScreenUtils.isCompactMobile(context);
-    final workItems = PortfolioRepository.work;
+    const workItems = PortfolioRepository.work;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),

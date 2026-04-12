@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_fonts.dart';
+import '../../../core/utils/screen_utils.dart';
 import '../../../data/repositories/portfolio_repository.dart';
 
 class SkillsBody extends StatefulWidget {
@@ -51,47 +52,59 @@ class _SkillsBodyState extends State<SkillsBody> {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
+    final isCompact = ScreenUtils.isCompactMobile(context);
     final fs = widget.fs;
     int tileIndex = 0;
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(12 * fs, 20 * fs, 12 * fs, 14 * fs),
       child: Column(
-        children: PortfolioRepository.skillGroups.map((g) {
-          final featured = g.featured;
-          final reception = g.reception;
-
-          return Padding(
-            padding: EdgeInsets.only(bottom: 14 * fs),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 24 * fs),
-                Row(children: [
-                  Text(g.label.toUpperCase(), style: AppFonts.tvChannel(color: colors.tvAccent, size: 7 * fs, letterSpacing: 3)),
-                  SizedBox(width: 8 * fs),
-                  _recvBars(reception),
-                  SizedBox(width: 8 * fs),
-                  Expanded(child: Container(height: 1, color: colors.tvAccent.withOpacity(0.1))),
-                ]),
-                SizedBox(height: 8 * fs),
-                Wrap(
-                  spacing: 5,
-                  runSpacing: 5,
-                  children: g.skills.asMap().entries.map((e) {
-                    final idx = tileIndex++;
-                    final shown = idx < _visible.length && _visible[idx];
-                    return AnimatedOpacity(
-                      duration: const Duration(milliseconds: 80),
-                      opacity: shown ? 1.0 : 0.0,
-                      child: _SkillTile(label: e.value, featured: featured, fs: fs),
-                    );
-                  }).toList(),
-                ),
-              ],
+        children: [
+          Text(
+            'SKILLS',
+            style: AppFonts.tvChannel(
+              color: colors.tvAccentLight,
+              size: isCompact ? 10 * fs : 12 * fs,
+              letterSpacing: 4,
             ),
-          );
-        }).toList(),
+          ),
+          const SizedBox(height: 8),
+          ...PortfolioRepository.skillGroups.map((g) {
+            final featured = g.featured;
+            final reception = g.reception;
+
+            return Padding(
+              padding: EdgeInsets.only(bottom: 14 * fs),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 24 * fs),
+                  Row(children: [
+                    Text(g.label.toUpperCase(), style: AppFonts.tvChannel(color: colors.tvAccent, size: 7 * fs, letterSpacing: 3)),
+                    SizedBox(width: 8 * fs),
+                    _recvBars(reception),
+                    SizedBox(width: 8 * fs),
+                    Expanded(child: Container(height: 1, color: colors.tvAccent.withOpacity(0.1))),
+                  ]),
+                  SizedBox(height: 8 * fs),
+                  Wrap(
+                    spacing: 5,
+                    runSpacing: 5,
+                    children: g.skills.asMap().entries.map((e) {
+                      final idx = tileIndex++;
+                      final shown = idx < _visible.length && _visible[idx];
+                      return AnimatedOpacity(
+                        duration: const Duration(milliseconds: 80),
+                        opacity: shown ? 1.0 : 0.0,
+                        child: _SkillTile(label: e.value, featured: featured, fs: fs),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ]
       ),
     );
   }
