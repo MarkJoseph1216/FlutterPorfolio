@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/providers/theme_provider.dart';
 import '../../../core/constants/app_colors.dart';
 
 class PowerButton extends StatefulWidget {

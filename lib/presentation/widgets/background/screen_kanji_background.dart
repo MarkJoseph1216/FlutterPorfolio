@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../../core/constants/app_colors.dart';
+import '../../../core/providers/theme_provider.dart';
 import '../../../core/utils/screen_utils.dart';
 
 class ScreenKanjiBackground extends StatelessWidget {
@@ -12,15 +13,17 @@ class ScreenKanjiBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
+    final isDark = ThemeProvider.isDark(context);
     final isMobile = ScreenUtils.isMobile(context);
     final isCompact = ScreenUtils.isCompactMobile(context);
-    final opacity = 0.15;
-    final sizes = [14.0, 16.0, 18.0, 20.0, 22.0, 24.0];
+
+    final opacity = isDark ? 0.08 : 0.12;
+    final sizes = [12.0, 14.0, 16.0, 18.0, 20.0, 22.0];
 
     int count;
-    if (isCompact) count = 8;
-    else if (isMobile) count = 15;
-    else count = 30;
+    if (isCompact) count = 6;
+    else if (isMobile) count = 10;
+    else count = 20;
 
     return IgnorePointer(
       child: RepaintBoundary(
@@ -31,6 +34,7 @@ class ScreenKanjiBackground extends StatelessWidget {
               final x = _rng.nextDouble() * c.maxWidth;
               final y = _rng.nextDouble() * c.maxHeight;
               final rotation = _rng.nextDouble() * math.pi * 2;
+
               return Positioned(
                 left: x,
                 top: y,
@@ -41,7 +45,9 @@ class ScreenKanjiBackground extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Courier',
                       fontSize: size,
-                      color: colors.tvAccent.withOpacity(opacity),
+                      color: isDark
+                          ? colors.tvAccent.withOpacity(opacity * 0.6)
+                          : colors.tvAccent.withOpacity(opacity),
                       fontWeight: FontWeight.w400,
                     ),
                   ),

@@ -285,17 +285,48 @@ class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderS
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeProvider.isDark(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return Stack(
           fit: StackFit.expand,
           children: [
-            const ColoredBox(color: Color(0xFF020202)),
+            ColoredBox(
+              color: isDark
+                  ? const Color(0xFF020202)
+                  : const Color(0xFFF5F0E8),
+            ),
+            if (!isDark)
+              IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withOpacity(0.05),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             const ScreenKanjiBackground(),
             if (widget.powered && !widget.showStatic)
               ChannelContent(channel: widget.channel),
             if (!widget.powered && !widget.showStatic)
-              const Center(child: SizedBox(width: 3, height: 2, child: ColoredBox(color: Color(0x44ffffff)))),
+              Center(
+                child: SizedBox(
+                  width: 3,
+                  height: 2,
+                  child: ColoredBox(
+                    color: isDark
+                        ? const Color(0x44ffffff)
+                        : const Color(0x441a1a1a),
+                  ),
+                ),
+              ),
             if (widget.showStatic)
               RepaintBoundary(
                 child: CustomPaint(
@@ -322,7 +353,12 @@ class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderS
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     radius: 1.15,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.5)],
+                    colors: [
+                      Colors.transparent,
+                      isDark
+                          ? Colors.black.withOpacity(0.78)
+                          : Colors.black.withOpacity(0.35),
+                    ],
                   ),
                 ),
               ),
@@ -333,7 +369,13 @@ class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderS
                 right: 14,
                 child: Text(
                   'CH·0${widget.channel.number}',
-                  style: AppFonts.tvChannel(color: const Color(0x2Effffff), size: 9, letterSpacing: 3),
+                  style: AppFonts.tvChannel(
+                    color: isDark
+                        ? const Color(0x2Effffff)
+                        : const Color(0x2e1a1a1a),
+                    size: 9,
+                    letterSpacing: 3,
+                  ),
                 ),
               ),
           ],

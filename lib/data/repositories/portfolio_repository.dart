@@ -37,8 +37,8 @@ abstract final class PortfolioRepository {
 
   static const List<({String value, String label})> stats = [
     (value: '7+', label: 'Years'),
-    (value: '12+', label: 'Apps'),
-    (value: '50K+', label: 'Downloads'),
+    (value: '∞', label: 'Adventure'),
+    (value: '10K+', label: 'Coffee day'),
     (value: '100%', label: 'Kotlin/Dart'),
   ];
 
@@ -109,7 +109,7 @@ abstract final class PortfolioRepository {
     ),
   ];
 
-  static const List<ProjectModel> projects = [
+  static const List<ProjectModel> work = [
     ProjectModel(
       index: '01',
       title: 'UnionBank of the Philippines',

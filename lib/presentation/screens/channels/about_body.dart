@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_fonts.dart';
+import '../../../core/utils/screen_utils.dart';
 import '../../../data/repositories/portfolio_repository.dart';
 import '../../widgets/common/profile_photo.dart';
 import '../../widgets/common/red_line.dart';
@@ -14,10 +15,12 @@ class AboutBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
+    final isMobile = ScreenUtils.isMobile(context);
+
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(14 * fs, 0, 14 * fs, 14 * fs),
       child: Column(children: [
-        SizedBox(height: isCompact ? 6 * fs : 24 * fs),
+        SizedBox(height: isCompact ? 14 * fs : isMobile ? 16 * fs : 24 * fs),
         ProfilePhoto(size: isCompact ? 40 * fs : 120 * fs),
         SizedBox(height: isCompact ? 6 * fs : 24 * fs),
         _InfoGrid(

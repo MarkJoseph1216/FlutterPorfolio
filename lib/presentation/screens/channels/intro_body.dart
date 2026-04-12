@@ -58,7 +58,7 @@ class _IntroBodyState extends State<IntroBody> with SingleTickerProviderStateMix
               Text(PortfolioRepository.title.toUpperCase(), style: AppFonts.labelSmall(color: colors.textMuted, size: isCompact ? 7 * fs : 8 * fs, letterSpacing: 3)),
               if (!isCompact) ...[
                 SizedBox(height: 6 * fs),
-                _StatsRow(fs: fs),
+                _AvailabilityRow(fs: fs),
               ],
               SizedBox(height: isCompact ? 8 * fs : 12 * fs),
               const RedLine(),
@@ -66,7 +66,7 @@ class _IntroBodyState extends State<IntroBody> with SingleTickerProviderStateMix
               Text(
                 isCompact ? 'SELECT CHANNEL' : '채널을 선택하세요\nSELECT A CHANNEL',
                 textAlign: TextAlign.center,
-                style: AppFonts.tvChannel(color: const Color(0x2Effffff), size: isCompact ? 6 * fs : 7 * fs, letterSpacing: 2),
+                style: AppFonts.tvChannel(color: colors.textSecondary, size: isCompact ? 6 * fs : 7 * fs, letterSpacing: 2),
               ),
             ],
           ),
@@ -76,44 +76,54 @@ class _IntroBodyState extends State<IntroBody> with SingleTickerProviderStateMix
   }
 }
 
-class _StatsRow extends StatefulWidget {
-  const _StatsRow({required this.fs});
+class _AvailabilityRow extends StatelessWidget {
+  const _AvailabilityRow({required this.fs});
   final double fs;
-
-  @override
-  State<_StatsRow> createState() => _StatsRowState();
-}
-
-class _StatsRowState extends State<_StatsRow> {
-  int _hoveredIdx = -1;
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: PortfolioRepository.stats.asMap().entries.map((e) {
-        final idx = e.key;
-        final s = e.value;
-        final hovered = _hoveredIdx == idx;
-        return MouseRegion(
-          onEnter: (_) => setState(() => _hoveredIdx = idx),
-          onExit: (_) => setState(() => _hoveredIdx = -1),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            padding: EdgeInsets.symmetric(horizontal: 8 * widget.fs, vertical: 4 * widget.fs),
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16 * fs, vertical: 10 * fs),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [colors.tvPowerOn.withOpacity(0.1), Colors.transparent],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        border: Border.all(color: colors.tvPowerOn.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 6,
             decoration: BoxDecoration(
-              border: Border.all(color: hovered ? colors.tvAccent.withOpacity(0.47) : colors.tvAccent.withOpacity(0.1)),
-              color: hovered ? colors.tvAccent.withOpacity(0.05) : Colors.transparent,
+              shape: BoxShape.circle,
+              color: colors.tvPowerOn,
+              boxShadow: [
+                BoxShadow(
+                  color: colors.tvPowerOn.withOpacity(0.5),
+                  blurRadius: 4,
+                ),
+              ],
             ),
-            child: Column(children: [
-              Text(s.value, style: AppFonts.tvDisplay(color: hovered ? colors.tvAccentLight : colors.textSecondary, size: 13 * widget.fs)),
-              Text(s.label, style: AppFonts.tvChannel(color: const Color(0x35ffffff), size: 6.5 * widget.fs, letterSpacing: 1)),
-            ]),
           ),
-        );
-      }).toList(),
+          const SizedBox(width: 5),
+          Text(
+            'OPEN FOR WORK',
+            style: AppFonts.tvRetro(
+              color: colors.tvPowerOn,
+              size: 9 * fs,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(width: 5),
+        ],
+      ),
     );
   }
 }

@@ -7,6 +7,6 @@ class RedLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
-    return Center(child: Container(width: 30, height: 1, color: colors.tvAccent.withOpacity(0.3)));
+    return Center(child: Container(width: 30, height: 1, color: colors.tvAccent.withOpacity(0.6)));
   }
 }

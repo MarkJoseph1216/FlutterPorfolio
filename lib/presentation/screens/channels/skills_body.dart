@@ -55,7 +55,7 @@ class _SkillsBodyState extends State<SkillsBody> {
     int tileIndex = 0;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(14 * fs, 4 * fs, 14 * fs, 14 * fs),
+      padding: EdgeInsets.fromLTRB(12 * fs, 20 * fs, 12 * fs, 14 * fs),
       child: Column(
         children: PortfolioRepository.skillGroups.map((g) {
           final featured = g.featured;
@@ -126,14 +126,14 @@ class _SkillTileState extends State<_SkillTile> {
           border: Border.all(
             color: widget.featured
                 ? (_hovered ? colors.tvAccent : colors.tvAccent.withOpacity(0.47))
-                : (_hovered ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.1)),
+                : (_hovered ? colors.textSecondary : colors.textMuted),
           ),
           borderRadius: BorderRadius.circular(1),
         ),
         child: Text(
           widget.label,
           style: AppFonts.tvRetro(
-            color: widget.featured ? colors.tvAccentLight : colors.textSecondary,
+            color: widget.featured ? colors.warmWhiteDim : colors.textSecondary,
             size: 8 * widget.fs,
             letterSpacing: 1,
           ),

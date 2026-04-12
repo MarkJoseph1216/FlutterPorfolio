@@ -174,7 +174,7 @@ class _ContactBodyState extends State<ContactBody> with SingleTickerProviderStat
 
     final credits = <Widget>[
       SizedBox(height: isCompact ? 40 * fs : 80 * fs),
-      Text('— 한국 드라마 비전 포트폴리오 —', style: AppFonts.tvChannel(color: const Color(0x1Affffff), size: isCompact ? 5 * fs : 7 * fs, letterSpacing: 4)),
+      Text('— 안녕하세요 —', style: AppFonts.tvChannel(color: const Color(0x1Affffff), size: isCompact ? 5 * fs : 7 * fs, letterSpacing: 4)),
       SizedBox(height: isCompact ? 12 * fs : 20 * fs),
       _section('주연 · STARRING', [
         _cname(PortfolioRepository.name, size: isCompact ? 14 * fs : 18 * fs, color: colors.textPrimary),

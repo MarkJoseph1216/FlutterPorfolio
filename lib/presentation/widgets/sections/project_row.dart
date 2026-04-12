@@ -162,20 +162,20 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(children: [
-                          Text(widget.number, style: AppFonts.tvChannel(color: colors.tvAccent.withOpacity(0.38), size: 7 * fs, letterSpacing: 2)),
+                          Text(widget.number, style: AppFonts.tvChannel(color: colors.tvAccent, size: 7 * fs, letterSpacing: 2)),
                           if (widget.category != null && !isCompact) ...[
                             SizedBox(width: 6 * fs),
-                            Text(widget.category!.toUpperCase(), style: AppFonts.tvChannel(color: const Color(0x38ffffff), size: 7 * fs, letterSpacing: 1)),
+                            Text(widget.category!.toUpperCase(), style: AppFonts.tvChannel(color: colors.textSecondary, size: 7 * fs, letterSpacing: 1)),
                           ],
                           if (widget.role != null && widget.role!.isNotEmpty && !isCompact) ...[
                             SizedBox(width: 6 * fs),
-                            Text(widget.role!, style: AppFonts.tvChannel(color: const Color(0x38ffffff), size: 7 * fs, letterSpacing: 1)),
+                            Text(widget.role!, style: AppFonts.tvChannel(color: colors.textSecondary, size: 7 * fs, letterSpacing: 1)),
                           ],
                         ]),
                         SizedBox(height: 4 * fs),
-                        Text(widget.title, style: AppFonts.subheading(color: _hovered ? colors.textPrimary : colors.textSecondary, size: isCompact ? 10 * fs : 12 * fs)),
+                        Text(widget.title, style: AppFonts.subheading(color: _hovered ? colors.textSecondary : colors.textPrimary, size: isCompact ? 10 * fs : 12 * fs)),
                         SizedBox(height: 3 * fs),
-                        Text(widget.tech, style: AppFonts.tvRetro(color: const Color(0x40ffffff), size: isCompact ? 6 * fs : 7 * fs, letterSpacing: 1)),
+                        Text(widget.tech, style: AppFonts.tvRetro(color: colors.warmWhiteDim, size: isCompact ? 6 * fs : 7 * fs, letterSpacing: 1)),
                       ],
                     ),
                   ),
@@ -184,7 +184,7 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(widget.year, style: AppFonts.tvRetro(color: const Color(0x2Effffff), size: isCompact ? 6 * fs : 7 * fs, letterSpacing: 1)),
+                      Text(widget.year, style: AppFonts.tvRetro(color: colors.textPrimary, size: isCompact ? 6 * fs : 7 * fs, letterSpacing: 1)),
                       SizedBox(height: 4 * fs),
                       AnimatedRotation(
                         turns: _expanded ? 0.5 : 0,
@@ -208,7 +208,7 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
                       children: [
                         Container(height: 1, color: colors.tvAccent.withOpacity(0.08), margin: EdgeInsets.only(bottom: 8 * fs)),
                         if (widget.description != null)
-                          Text(widget.description!, style: AppFonts.bodySmall(color: const Color(0x55ffffff), size: isCompact ? 8 * fs : 9.5 * fs, height: 1.5)),
+                          Text(widget.description!, style: AppFonts.bodySmall(color: colors.textSecondary, size: isCompact ? 8 * fs : 9.5 * fs, height: 1.5)),
                         if (widget.url != null) ...[
                           SizedBox(height: 8 * fs),
                           GestureDetector(
@@ -216,7 +216,7 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('VIEW PROJECT  ↗', style: AppFonts.tvRetro(color: colors.tvAccent.withOpacity(0.5), size: isCompact ? 7 * fs : 8 * fs, letterSpacing: 2)),
+                                Text('VIEW PROJECT  ↗', style: AppFonts.tvRetro(color: colors.tvAccent, size: isCompact ? 7 * fs : 8 * fs, letterSpacing: 2)),
                               ],
                             ),
                           ),
