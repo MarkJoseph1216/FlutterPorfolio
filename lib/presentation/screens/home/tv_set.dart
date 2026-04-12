@@ -12,6 +12,7 @@ import '../../widgets/common/mode_toggle.dart';
 import '../../widgets/common/power_button.dart';
 import '../../widgets/common/channel_button.dart';
 import '../../widgets/common/knob_widget.dart';
+import '../../widgets/common/recording_indicator.dart';
 import '../../widgets/sections/desktop_info_bar.dart';
 import '../../widgets/sections/mobile_controls.dart';
 import '../../widgets/background/screen_kanji_background.dart';
@@ -286,6 +287,7 @@ class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderS
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeProvider.isDark(context);
+    final colors = AppColors.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -363,6 +365,14 @@ class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderS
                 ),
               ),
             ),
+
+            if (widget.powered && !widget.showStatic)
+              const Positioned(
+                top: 10,
+                left: 14,
+                child: RecordingIndicator(size: 6),
+              ),
+
             if (widget.powered && !widget.showStatic)
               Positioned(
                 top: 10,
@@ -370,9 +380,7 @@ class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderS
                 child: Text(
                   'CH·0${widget.channel.number}',
                   style: AppFonts.tvChannel(
-                    color: isDark
-                        ? const Color(0x2Effffff)
-                        : const Color(0x2e1a1a1a),
+                    color: colors.textSecondary,
                     size: 9,
                     letterSpacing: 3,
                   ),

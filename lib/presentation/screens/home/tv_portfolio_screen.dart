@@ -6,6 +6,7 @@ import '../../../core/utils/screen_utils.dart';
 import '../../widgets/background/bg_grid.dart';
 import '../../widgets/background/bg_kanji.dart';
 import '../../widgets/background/bg_vignette.dart';
+import '../../widgets/common/floating_chat_button.dart';
 import 'tv_set.dart';
 
 class TvPortfolioScreen extends StatefulWidget {
@@ -117,6 +118,8 @@ class _TvPortfolioScreenState extends State<TvPortfolioScreen> {
                   child: TvSet(),
                 ),
               ),
+
+              const FloatingChatButton(),
             ],
           ),
         ),
