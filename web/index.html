@@ -14,7 +14,6 @@
   <link rel="preload" href="canvaskit/canvaskit.js" as="script">
   <link rel="preload" href="canvaskit/canvaskit.wasm" as="fetch" crossorigin="anonymous">
   <style>
-    /* Performance optimizations */
     * {
       -webkit-overflow-scrolling: touch;
       -webkit-tap-highlight-color: transparent;
@@ -33,7 +32,6 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Improve scroll performance on iOS/iPad */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -52,14 +50,12 @@
       background: rgba(255, 255, 255, 0.3);
     }
 
-    /* Hardware acceleration for smoother scrolling */
     .scrollable {
       transform: translateZ(0);
       will-change: scroll-position;
       backface-visibility: hidden;
     }
 
-    /* Loading animation */
     #loader {
       position: fixed;
       inset: 0;
@@ -93,12 +89,10 @@
       50%       { opacity: 1;   transform: scale(1.2); }
     }
 
-    /* Prevent pull-to-refresh on iOS */
     body {
       overscroll-behavior: none;
     }
 
-    /* Optimize canvas rendering */
     canvas {
       will-change: transform;
       transform: translateZ(0);

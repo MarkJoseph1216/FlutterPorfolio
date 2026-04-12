@@ -318,17 +318,7 @@ class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderS
             if (widget.powered && !widget.showStatic)
               ChannelContent(channel: widget.channel),
             if (!widget.powered && !widget.showStatic)
-              Center(
-                child: SizedBox(
-                  width: 3,
-                  height: 2,
-                  child: ColoredBox(
-                    color: isDark
-                        ? const Color(0x44ffffff)
-                        : const Color(0x441a1a1a),
-                  ),
-                ),
-              ),
+              const _PoweredOffScreen(),
             if (widget.showStatic)
               RepaintBoundary(
                 child: CustomPaint(
@@ -486,4 +476,46 @@ class _ScanlinePainter extends CustomPainter {
   }
   @override
   bool shouldRepaint(_ScanlinePainter old) => old.image != image;
+}
+
+class _PoweredOffScreen extends StatelessWidget {
+  const _PoweredOffScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    final isDark = ThemeProvider.isDark(context);
+
+    return Container(
+      color: isDark ? const Color(0xFF000000) : const Color(0xFF0a0a0a),
+      child: Align(
+        alignment: Alignment.center,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 4,
+                height: 4,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.red,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'POWER OFF',
+                style: AppFonts.tvChannel(
+                  color: colors.textMuted,
+                  size: 7,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

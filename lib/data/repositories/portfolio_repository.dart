@@ -27,7 +27,7 @@ abstract final class PortfolioRepository {
 
   static const String heroBio =
       'I primarily build high performance Android apps using Kotlin and Jetpack Compose,'
-      ' while also creating cross-platform experiences with Flutter. '
+      ' while also creating cross platform experiences with Flutter. '
       'I focus on clean architecture, smooth micro-interactions, '
       'and products people genuinely enjoy using.';
 

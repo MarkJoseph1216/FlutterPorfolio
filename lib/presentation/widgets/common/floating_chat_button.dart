@@ -143,7 +143,7 @@ class _FloatingChatButtonState extends State<FloatingChatButton>
                               Text(
                                 'Chat with Mj',
                                 style: AppFonts.tvRetro(
-                                  color: colors.tvAccentLight,
+                                  color: colors.warmWhite,
                                   size: 10,
                                   letterSpacing: 2,
                                 ),

@@ -173,7 +173,7 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
                           ],
                         ]),
                         SizedBox(height: 4 * fs),
-                        Text(widget.title, style: AppFonts.subheading(color: _hovered ? colors.textSecondary : colors.textPrimary, size: isCompact ? 10 * fs : 12 * fs)),
+                        Text(widget.title, style: AppFonts.tvRetro(color: _hovered ? colors.textSecondary : colors.textPrimary, size: isCompact ? 10 * fs : 12 * fs)),
                         SizedBox(height: 3 * fs),
                         Text(widget.tech, style: AppFonts.tvRetro(color: colors.warmWhiteDim, size: isCompact ? 6 * fs : 7 * fs, letterSpacing: 1)),
                       ],

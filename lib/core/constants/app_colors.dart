@@ -23,7 +23,7 @@ abstract final class AppColors {
     tvAccent: Color(0xFF8b0000),
     tvAccentLight: Color(0xFFdcb4b4),
     tvPowerOn: Color(0xFF1a4a1a),
-    tvPowerOff: Color(0xFF161616),
+    tvPowerOff: Color(0xFFFF0101),
     tvScanline: Color(0x15000000),
 
     // Live code block colors.
@@ -54,7 +54,7 @@ abstract final class AppColors {
     tvAccent: Color(0xFF8b0000),
     tvAccentLight: Color(0xFFdcb4b4),
     tvPowerOn: Color(0xFF1a4a1a),
-    tvPowerOff: Color(0xFFe0d9cc),
+    tvPowerOff: Color(0xffdf1414),
     tvScanline: Color(0x15000000),
 
     // Live code block colors.

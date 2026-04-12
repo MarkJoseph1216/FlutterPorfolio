@@ -27,9 +27,9 @@ class DesktopInfoBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _InfoChip(label: 'SIGNAL', value: '▓▓▓▓▓  EXCELLENT', animated: true),
+            const _InfoChip(label: 'SIGNAL', value: '▓▓▓▓▓  EXCELLENT', animated: true),
             _InfoChip(label: 'CHANNEL', value: 'CH·0${current.number}  ${current.kr} / ${current.en}', highlighted: true),
-            _InfoChip(label: 'STATUS', value: powered ? '● LIVE' : '○ OFF', valueColor: powered ? colors.tvPowerOn : colors.textMuted, pulsing: powered),
+            _InfoChip(label: 'STATUS', value: powered ? '● LIVE' : '○ OFF', valueColor: powered ? colors.tvPowerOn : colors.tvPowerOff, pulsing: powered),
           ],
         ),
       ),

@@ -36,7 +36,7 @@ class AboutBody extends StatelessWidget {
         SizedBox(height: isCompact ? 6 * fs : 10 * fs),
         const RedLine(),
         SizedBox(height: isCompact ? 4 * fs : 8 * fs),
-        Text(PortfolioRepository.heroBio, textAlign: TextAlign.center, style: AppFonts.bodySmall(color: colors.textSecondary, size: isCompact ? 8 * fs : 10 * fs, height: 1.7)),
+        Text(PortfolioRepository.bio1, textAlign: TextAlign.center, style: AppFonts.bodySmall(color: colors.textSecondary, size: isCompact ? 8 * fs : 10 * fs, height: 1.7)),
         SizedBox(height: 12 * fs),
         LiveCodeBlock(fs: fs, isCompact: isCompact),
       ]),
