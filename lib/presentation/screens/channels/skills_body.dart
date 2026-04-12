@@ -66,6 +66,7 @@ class _SkillsBodyState extends State<SkillsBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 24 * fs),
                 Row(children: [
                   Text(g.label.toUpperCase(), style: AppFonts.tvChannel(color: colors.tvAccent, size: 7 * fs, letterSpacing: 3)),
                   SizedBox(width: 8 * fs),

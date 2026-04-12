@@ -155,7 +155,7 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
             Padding(
               padding: EdgeInsets.only(right: isMobile ? 8 : 0),
               child: const Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [ModeToggle()],
               ),
             ),
@@ -276,11 +276,9 @@ class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderS
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Check if orientation changed
     final currentOrientation = MediaQuery.of(context).orientation;
     if (_lastOrientation != currentOrientation) {
       _lastOrientation = currentOrientation;
-      // Force rebuild when orientation changes
       setState(() {});
     }
   }

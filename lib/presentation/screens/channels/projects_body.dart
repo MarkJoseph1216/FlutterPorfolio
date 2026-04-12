@@ -9,7 +9,7 @@ class ProjectsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(12 * fs, 0, 12 * fs, 14 * fs),
+      padding: EdgeInsets.fromLTRB(12 * fs, 20 * fs, 12 * fs, 14 * fs),
       child: Column(
         children: PortfolioRepository.sideProjects.asMap().entries.map((e) {
           final p = e.value;
