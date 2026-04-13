@@ -192,11 +192,6 @@ class _ProfileScreenSaverState extends State<ProfileScreenSaver> with SingleTick
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.disc_full,
-                              size: _logoSize * 0.25,
-                              color: Colors.white,
-                            ),
                             const SizedBox(height: 4),
                             Text(
                               'DVD',

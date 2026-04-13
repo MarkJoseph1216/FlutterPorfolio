@@ -670,7 +670,7 @@ class _PoweredOffScreen extends StatelessWidget {
               Text(
                 'POWER OFF',
                 style: AppFonts.tvChannel(
-                  color: colors.textMuted,
+                  color: colors.tvPowerOff,
                   size: 7,
                   letterSpacing: 2,
                 ),

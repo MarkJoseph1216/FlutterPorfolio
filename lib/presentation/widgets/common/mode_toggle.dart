@@ -41,7 +41,7 @@ class _ModeToggleState extends State<ModeToggle> {
           child: Text(
             isDark ? '☀  LIGHT' : '◑  DARK',
             style: AppFonts.tvRetro(
-              color: _hovered ? colors.tvAccentLight : colors.textMuted,
+              color: _hovered ? colors.tvAccent : colors.textSecondary,
               size: 8,
               letterSpacing: 2,
             ),
