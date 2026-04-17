@@ -15,6 +15,7 @@ import '../../widgets/common/channel_button.dart';
 import '../../widgets/common/knob_widget.dart';
 import '../../widgets/common/profile_screen_saver.dart';
 import '../../widgets/common/recording_indicator.dart';
+import '../../widgets/common/snake_game.dart';
 import '../../widgets/sections/desktop_info_bar.dart';
 import '../../widgets/sections/mobile_controls.dart';
 import '../../widgets/background/screen_kanji_background.dart';
@@ -118,7 +119,7 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
   void _next() {
     if (!_powered || _busy) return;
     _nextTurns.value += 1;
-    final values = ChannelModel.values;
+    const values = ChannelModel.values;
     _go(values[(values.indexOf(_current) + 1) % values.length]);
   }
 
@@ -137,6 +138,17 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
       setState(() => _powered = true);
       _playStatic(12, () {});
     }
+  }
+
+  void _showSnakeGame(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const Dialog(
+        backgroundColor: Colors.transparent,
+        child: SnakeGame(),
+      ),
+    );
   }
 
   @override
@@ -297,6 +309,24 @@ class _TvSetState extends State<TvSet> with SingleTickerProviderStateMixin {
                                 onTap: () => _go(ch),
                                 isDesktop: isDesktop)))
                             .toList()),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => _showSnakeGame(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: colors.border),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'GAME',
+                      style: AppFonts.tvRetro(
+                        color: colors.textSecondary,
+                        size: 10,
+                        letterSpacing: 2,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -578,7 +608,7 @@ class _StaticPainter extends CustomPainter {
   final double height;
 
   static final Map<String, ui.Image> _imageCache = {};
-  static const px = 6.0;
+  static const px = 8.0;
 
   @override
   void paint(Canvas canvas, Size size) {

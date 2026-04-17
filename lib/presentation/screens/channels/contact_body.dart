@@ -412,15 +412,14 @@ class _ContactBodyState extends State<ContactBody> with SingleTickerProviderStat
               ),
               child: Row(
                 children: [
-                  Icon(Icons.error_outline, size: 14, color: Colors.red),
+                  const Icon(Icons.error_outline, size: 14, color: Colors.red),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _errorMessage!,
-                      style: TextStyle(
-                        fontFamily: 'Courier',
-                        fontSize: 10 * fs,
+                      style: AppFonts.label(
                         color: Colors.red,
+                        size: 10 * fs,
                       ),
                     ),
                   ),

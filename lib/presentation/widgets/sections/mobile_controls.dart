@@ -5,6 +5,7 @@ import '../../../core/providers/theme_provider.dart';
 import '../../../data/models/channel_model.dart';
 import '../common/power_button.dart';
 import '../common/channel_button.dart';
+import '../common/snake_game.dart';
 import 'retro_radio_slider.dart';
 
 class MobileControls extends StatefulWidget {
@@ -93,9 +94,18 @@ class _MobileControlsState extends State<MobileControls> {
     });
   }
 
+  void _showSnakeGame() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const SnakeGame(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
+    final isMobile = MediaQuery.of(context).size.width < 640;
 
     return Column(
       children: [
@@ -148,28 +158,65 @@ class _MobileControlsState extends State<MobileControls> {
                       ),
                     ),
 
-                  // Scrollable channel buttons
                   SingleChildScrollView(
                     controller: _scrollController,
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     child: Row(
-                      children: ChannelModel.values.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final ch = entry.value;
-                        final isActive = widget.current == ch && widget.powered;
-
-                        return Container(
-                          key: _buttonKeys[index],
+                      children: [
+                        Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: ChannelButton(
-                            channel: ch,
-                            active: isActive,
-                            onTap: () => widget.onChannel(ch),
-                            isDesktop: false,
+                          child: GestureDetector(
+                            onTap: _showSnakeGame,
+                            child: Container(
+                              width: 55,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    colors.tvPowerOn.withOpacity(0.15),
+                                    colors.tvPowerOn.withOpacity(0.05),
+                                  ],
+                                ),
+                                border: Border.all(
+                                  color: colors.tvPowerOn.withOpacity(0.5),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'GAME',
+                                  style: AppFonts.tvRetro(
+                                    color: colors.tvAccentLight,
+                                    size: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                        );
-                      }).toList(),
+                        ),
+
+                        // Channel buttons
+                        ...ChannelModel.values.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final ch = entry.value;
+                          final isActive = widget.current == ch && widget.powered;
+
+                          return Container(
+                            key: _buttonKeys[index],
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: ChannelButton(
+                              channel: ch,
+                              active: isActive,
+                              onTap: () => widget.onChannel(ch),
+                              isDesktop: false,
+                            ),
+                          );
+                        }),
+                      ],
                     ),
                   ),
                 ],
@@ -193,7 +240,7 @@ class _MobileControlsState extends State<MobileControls> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Scroll for more channels',
+                  'Scroll for more',
                   style: AppFonts.tvChannel(
                     color: colors.textMuted,
                     size: 8,
