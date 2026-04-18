@@ -372,8 +372,7 @@ class _ScreenWidget extends StatefulWidget {
   State<_ScreenWidget> createState() => _ScreenWidgetState();
 }
 
-class _ScreenWidgetState extends State<_ScreenWidget>
-    with SingleTickerProviderStateMixin {
+class _ScreenWidgetState extends State<_ScreenWidget> with SingleTickerProviderStateMixin {
   late Orientation _lastOrientation;
   Timer? _inactivityTimer;
   bool _showScreenSaver = false;
@@ -388,9 +387,24 @@ class _ScreenWidgetState extends State<_ScreenWidget>
   @override
   void didUpdateWidget(_ScreenWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.channel != widget.channel ||
-        oldWidget.powered != widget.powered) {
+
+    if (oldWidget.channel != widget.channel) {
       _resetInactivityTimer();
+    }
+
+    if (oldWidget.powered != widget.powered) {
+      if (!widget.powered) {
+        setState(() {
+          _showScreenSaver = false;
+        });
+        _inactivityTimer?.cancel();
+      } else {
+        setState(() {
+          _showScreenSaver = false;
+        });
+        _inactivityTimer?.cancel();
+        _resetInactivityTimer();
+      }
     }
   }
 
@@ -412,9 +426,9 @@ class _ScreenWidgetState extends State<_ScreenWidget>
 
   void _resetInactivityTimer() {
     _inactivityTimer?.cancel();
-    if (widget.powered && !widget.showStatic) {
-      _inactivityTimer = Timer(const Duration(minutes: 1), () {
-        if (mounted && widget.powered) {
+    if (widget.powered && !widget.showStatic && !_showScreenSaver) {
+      _inactivityTimer = Timer(const Duration(seconds: 30), () {
+        if (mounted && widget.powered && !widget.showStatic) {
           setState(() {
             _showScreenSaver = true;
           });
@@ -452,9 +466,9 @@ class _ScreenWidgetState extends State<_ScreenWidget>
               return Stack(
                 fit: StackFit.expand,
                 children: [
+                  // Background
                   ColoredBox(
-                    color:
-                        isDark ? const Color(0xFF020202) : const Color(0xFFF5F0E8),
+                    color: isDark ? const Color(0xFF020202) : const Color(0xFFF5F0E8),
                   ),
                   if (!isDark)
                     IgnorePointer(
@@ -472,15 +486,19 @@ class _ScreenWidgetState extends State<_ScreenWidget>
                       ),
                     ),
                   const ScreenKanjiBackground(),
+
                   if (!_showScreenSaver && widget.powered && !widget.showStatic)
                     ChannelContent(channel: widget.channel),
+
+                  // Powered Off Screen
                   if (!widget.powered && !widget.showStatic && !_showScreenSaver)
                     const _PoweredOffScreen(),
+
+                  // Static effect
                   if (widget.showStatic)
                     RepaintBoundary(
                       child: CustomPaint(
-                        key: ValueKey(
-                            'static_${widget.staticSeed}_${constraints.maxWidth}_${constraints.maxHeight}'),
+                        key: ValueKey('static_${widget.staticSeed}_${constraints.maxWidth}_${constraints.maxHeight}'),
                         painter: _StaticPainter(
                           seed: widget.staticSeed,
                           width: constraints.maxWidth,
@@ -489,7 +507,9 @@ class _ScreenWidgetState extends State<_ScreenWidget>
                         size: Size(constraints.maxWidth, constraints.maxHeight),
                       ),
                     ),
-                  if (widget.scanlines != null && !widget.showStatic && !_showScreenSaver)
+
+                  // Scanlines
+                  if (widget.scanlines != null && !widget.showStatic && !_showScreenSaver && widget.powered)
                     IgnorePointer(
                       child: RepaintBoundary(
                         child: CustomPaint(
@@ -498,6 +518,8 @@ class _ScreenWidgetState extends State<_ScreenWidget>
                         ),
                       ),
                     ),
+
+                  // Vignette
                   IgnorePointer(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
@@ -513,12 +535,16 @@ class _ScreenWidgetState extends State<_ScreenWidget>
                       ),
                     ),
                   ),
+
+                  // Recording Indicator
                   if (widget.powered && !widget.showStatic)
                     const Positioned(
                       top: 10,
                       left: 14,
                       child: RecordingIndicator(size: 6),
                     ),
+
+                  // Channel Number
                   if (!_showScreenSaver && widget.powered && !widget.showStatic)
                     Positioned(
                       top: 10,
@@ -532,6 +558,8 @@ class _ScreenWidgetState extends State<_ScreenWidget>
                         ),
                       ),
                     ),
+
+                  // Screen Saver
                   if (_showScreenSaver && widget.powered && !widget.showStatic)
                     ProfileScreenSaver(
                       isActive: true,
