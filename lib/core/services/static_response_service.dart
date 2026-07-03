@@ -9,17 +9,17 @@ class StaticResponseService {
       if (message.contains('this') || message.contains('current') || message.contains('here')) {
         switch (currentChannel) {
           case ChannelModel.intro:
-            return "📺 You're currently on the INTRO channel. This is where you can learn about who I am - ${PortfolioRepository.name}, a ${PortfolioRepository.role} with ${PortfolioRepository.experience} of experience. Feel free to explore other channels!";
+            return "You're currently on the INTRO channel. This is where you can learn about who I am - ${PortfolioRepository.name}, a ${PortfolioRepository.role} with ${PortfolioRepository.experience} of experience. Feel free to explore other channels!";
           case ChannelModel.about:
-            return "📺 You're on the ABOUT channel. Here you'll find detailed information about my background, including my ${PortfolioRepository.experience} of experience and ${PortfolioRepository.details.length} key details about my professional journey.";
+            return "You're on the ABOUT channel. Here you'll find detailed information about my background, including my ${PortfolioRepository.experience} of experience and ${PortfolioRepository.details.length} key details about my professional journey.";
           case ChannelModel.skills:
-            return "📺 You're on the SKILLS channel. This shows my technical expertise across ${PortfolioRepository.skillGroups.length} categories: ${PortfolioRepository.skillGroups.map((g) => g.label).join(', ')}. Check out the reception bars to see my proficiency levels!";
+            return "You're on the SKILLS channel. This shows my technical expertise across ${PortfolioRepository.skillGroups.length} categories: ${PortfolioRepository.skillGroups.map((g) => g.label).join(', ')}. Check out the reception bars to see my proficiency levels!";
           case ChannelModel.work:
-            return "📺 You're on the WORK channel. This displays my professional experience at ${PortfolioRepository.work.length} companies: ${PortfolioRepository.work.map((p) => p.title).join(', ')}. Click on any card to see detailed descriptions!";
+            return "You're on the WORK channel. This displays my professional experience at ${PortfolioRepository.work.length} companies: ${PortfolioRepository.work.map((p) => p.title).join(', ')}. Click on any card to see detailed descriptions!";
           case ChannelModel.projects:
-            return "📺 You're on the PROJECTS channel. Here you can explore my ${PortfolioRepository.sideProjects.length} side projects including ${PortfolioRepository.sideProjects.take(3).map((p) => p.title).join(', ')}. Each project has a link to view more!";
+            return "You're on the PROJECTS channel. Here you can explore my ${PortfolioRepository.sideProjects.length} side projects including ${PortfolioRepository.sideProjects.take(3).map((p) => p.title).join(', ')}. Each project has a link to view more!";
           case ChannelModel.contact:
-            return "📺 You're on the CONTACT channel. You can reach me at ${PortfolioRepository.email} or use the contact form to send me a message. I typically respond within 24 hours!";
+            return "You're on the CONTACT channel. You can reach me at ${PortfolioRepository.email} or use the contact form to send me a message. I typically respond within 24 hours!";
         }
       }
     }
@@ -62,12 +62,12 @@ class StaticResponseService {
     if (message.contains('project') || message.contains('portfolio') || message.contains('build') || message.contains('made')) {
       final workProjects = PortfolioRepository.work;
       final sideProjects = PortfolioRepository.sideProjects;
-      return "I've built ${workProjects.length + sideProjects.length}+ apps including:\n\n🏢 WORK PROJECTS:\n• ${workProjects.map((p) => p.title).join('\n• ')}\n\n🎨 SIDE PROJECTS:\n• ${sideProjects.take(4).map((p) => p.title).join('\n• ')}\n\nCheck out the WORK and PROJECTS channels to see them all with details!";
+      return "I've built ${workProjects.length + sideProjects.length}+ apps including:\n\nWORK PROJECTS:\n• ${workProjects.map((p) => p.title).join('\n• ')}\n\nSIDE PROJECTS:\n• ${sideProjects.take(4).map((p) => p.title).join('\n• ')}\n\nCheck out the WORK and PROJECTS channels to see them all with details!";
     }
 
     // Contact
     if (message.contains('contact') || message.contains('email') || message.contains('reach') || message.contains('get in touch')) {
-      return "You can reach me at ${PortfolioRepository.email}\n\n🔗 GitHub: ${PortfolioRepository.github}\n🔗 LinkedIn: ${PortfolioRepository.linkedin}\n📱 TikTok: ${PortfolioRepository.contactLinks.last.value}\n\nOr use the contact form in the CONTACT channel. I typically respond within 24 hours!";
+      return "You can reach me at ${PortfolioRepository.email}\n\nGitHub: ${PortfolioRepository.github}\nLinkedIn: ${PortfolioRepository.linkedin}\nTikTok: ${PortfolioRepository.contactLinks.last.value}\n\nOr use the contact form in the CONTACT channel. I typically respond within 24 hours!";
     }
 
     // Hire/Work with me
@@ -126,6 +126,6 @@ class StaticResponseService {
     }
 
     // Default response
-    return "Thanks for your message! 💬 I appreciate you reaching out.\n\nHere's what you can explore on my portfolio:\n\n📺 ${ChannelModel.values.length} CHANNELS:\n• INTRO - About me\n• ABOUT - My background\n• SKILLS - ${PortfolioRepository.skillGroups.length} tech categories\n• WORK - ${PortfolioRepository.work.length} professional experiences\n• PROJECTS - ${PortfolioRepository.sideProjects.length} side projects\n• CONTACT - Get in touch\n\n📧 Or email me directly: ${PortfolioRepository.email}\n\nIs there anything specific you'd like to know about my ${PortfolioRepository.experience} of experience or any of my projects?";
+    return "Thanks for your message! I appreciate you reaching out.\n\nHere's what you can explore on my portfolio:\n\n${ChannelModel.values.length} CHANNELS:\n• INTRO - About me\n• ABOUT - My background\n• SKILLS - ${PortfolioRepository.skillGroups.length} tech categories\n• WORK - ${PortfolioRepository.work.length} professional experiences\n• PROJECTS - ${PortfolioRepository.sideProjects.length} side projects\n• CONTACT - Get in touch\n\n~ Or email me directly: ${PortfolioRepository.email}\n\nIs there anything specific you'd like to know about my ${PortfolioRepository.experience} of experience or any of my projects?";
   }
 }

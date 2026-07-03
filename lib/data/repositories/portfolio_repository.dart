@@ -112,18 +112,30 @@ abstract final class PortfolioRepository {
   static const List<ProjectModel> work = [
     ProjectModel(
       index: '01',
-      title: 'UnionBank of the Philippines',
+      title: 'Digital Space Explorer Inc.',
       year: '2026',
-      role: 'Software Engineer',
+      role: 'Android Developer',
       description:
-      'Developed and maintained a production-grade Android mobile banking '
-          'application supporting real-time fund transfers and digital banking features.',
-      techStack: ['Kotlin', 'Jetpack Compose', 'Room', 'Retrofit'],
+      'Built and maintained complex feed components and caching architecture for '
+          'a enterprise mobile CRM, prioritizing offline availability and dynamic UI rendering.',
+      techStack: ['Kotlin', 'Jetpack Compose', 'Clean Architecture', 'Room Database'],
       playStoreUrl:
-      'https://play.google.com/store/apps/details?id=com.unionbankph.corporate&hl=en',
+      'https://play.google.com/store/apps/details?id=com.digitalspaceexplorer.squadzip&hl=en',
     ),
     ProjectModel(
       index: '02',
+      title: 'Accenture Philippines',
+      year: '2024',
+      role: 'Software Engineer',
+      description:
+      'Developed and refined digital onboarding flows and real time financial tracking features '
+          'for the UBS key4 platform, ensuring seamless UI state management and cross device '
+          'stability under strict regulatory compliance.',
+      techStack: ['Kotlin', 'Jetpack Compose', 'MVVM', 'Coroutines'],
+      playStoreUrl: 'https://play.google.com/store/apps/details?id=com.ubs.swidKXJ.android&hl=en',
+    ),
+    ProjectModel(
+      index: '03',
       title: 'Invisible Hand Inc.',
       year: '2021',
       role: 'Android Developer',
@@ -133,7 +145,7 @@ abstract final class PortfolioRepository {
       techStack: ['Java', 'Kotlin', 'Agora', 'Payment', 'AWS'],
     ),
     ProjectModel(
-      index: '03',
+      index: '04',
       title: 'Byltax Systems Inc.',
       year: '2020',
       role: 'Mobile Developer',
@@ -144,7 +156,7 @@ abstract final class PortfolioRepository {
       techStack: ['Java', 'Kotlin', 'Flutter', 'Swift', 'Firebase'],
     ),
     ProjectModel(
-      index: '04',
+      index: '05',
       title: 'Chase Technologies Inc.',
       year: '2019',
       role: 'Android Developer',
@@ -159,6 +171,19 @@ abstract final class PortfolioRepository {
   static const List<ProjectModel> sideProjects = [
     ProjectModel(
       index: '01',
+      title: 'HatidGo',
+      year: '2026',
+      role: 'Mobile/Web',
+      description:
+      'A ride hailing and car booking platform featuring real time driver matching, '
+          'live location tracking, and an interactive fare bidding system for flexible pricing.',
+      techStack: ['Flutter', 'Dart', 'Google Maps API', 'Laravel'],
+      category: ProjectCategory.freelance,
+      thumbnailAsset: 'assets/thumbnails/hatidgo.png',
+      urlLink: 'https://www.facebook.com/profile.php?id=61576444353477',
+    ),
+    ProjectModel(
+      index: '02',
       title: 'Personal Mobile Assistant',
       year: '2023',
       role: 'Android',
@@ -173,7 +198,7 @@ abstract final class PortfolioRepository {
       'https://www.tiktok.com/@dev.imrkjoseph/video/7268900076364336389',
     ),
     ProjectModel(
-      index: '02',
+      index: '03',
       title: 'Motorcycle Fingerprint Security',
       year: '2023',
       description:
@@ -187,7 +212,7 @@ abstract final class PortfolioRepository {
       'https://www.tiktok.com/@dev.imrkjoseph/video/7273514618864127238',
     ),
     ProjectModel(
-      index: '03',
+      index: '04',
       title: 'Animeflix',
       year: '2024',
       role: 'Android/iOS',
@@ -201,7 +226,7 @@ abstract final class PortfolioRepository {
       'https://www.tiktok.com/@dev.imrkjoseph/video/7350223416059759878',
     ),
     ProjectModel(
-      index: '04',
+      index: '05',
       title: 'KwikSerbisyo',
       year: '2023',
       role: 'Mobile/Web',
@@ -214,7 +239,7 @@ abstract final class PortfolioRepository {
       urlLink: 'https://kwikserbisyo.online/',
     ),
     ProjectModel(
-      index: '05',
+      index: '06',
       title: 'E-Robot',
       year: '2019',
       description:
@@ -225,7 +250,7 @@ abstract final class PortfolioRepository {
       category: ProjectCategory.personal,
     ),
     ProjectModel(
-      index: '06',
+      index: '07',
       title: 'Traysitek',
       year: '2023',
       role: 'Mobile/Web',
