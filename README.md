@@ -1,4 +1,4 @@
-# mj_portfolio_website
+# Mj Portfolio Website
 
 A new Flutter project.
 
