@@ -172,12 +172,12 @@ abstract final class PortfolioRepository {
     ProjectModel(
       index: '01',
       title: 'HatidGo',
-      year: '2026',
+      year: '',
       role: 'Mobile/Web',
       description:
       'A ride hailing and car booking platform featuring real time driver matching, '
           'live location tracking, and an interactive fare bidding system for flexible pricing.',
-      techStack: ['Flutter', 'Dart', 'Google Maps API', 'Laravel'],
+      techStack: ['Flutter', 'Dart', 'Laravel'],
       category: ProjectCategory.freelance,
       thumbnailAsset: 'assets/thumbnails/hatidgo.png',
       urlLink: 'https://www.facebook.com/profile.php?id=61576444353477',
@@ -240,17 +240,6 @@ abstract final class PortfolioRepository {
     ),
     ProjectModel(
       index: '06',
-      title: 'E-Robot',
-      year: '2019',
-      description:
-      'Autonomous obstacle-avoidance robot powered by Arduino Nano with '
-          'distance sensors to detect obstacles and dynamically change '
-          'direction, preventing collisions.',
-      techStack: ['Arduino Nano', 'Micro-controller'],
-      category: ProjectCategory.personal,
-    ),
-    ProjectModel(
-      index: '07',
       title: 'Traysitek',
       year: '2023',
       role: 'Mobile/Web',
@@ -262,6 +251,17 @@ abstract final class PortfolioRepository {
       category: ProjectCategory.freelance,
       thumbnailAsset: 'assets/thumbnails/traysitek.jpg',
       urlLink: 'https://traysikel.tech/',
+    ),
+    ProjectModel(
+      index: '07',
+      title: 'E-Robot',
+      year: '2019',
+      description:
+      'Autonomous obstacle-avoidance robot powered by Arduino Nano with '
+          'distance sensors to detect obstacles and dynamically change '
+          'direction, preventing collisions.',
+      techStack: ['Arduino Nano', 'Micro-controller'],
+      category: ProjectCategory.personal,
     ),
   ];
 
