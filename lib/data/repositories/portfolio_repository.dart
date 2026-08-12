@@ -208,7 +208,7 @@ abstract final class PortfolioRepository {
       index: '03',
       title: 'MasidTunes',
       year: '2026',
-      role: 'Mobile/Web',
+      role: 'Mobile',
       description:
       'A spotify style music app with zero ads. Discover new tracks, watch music videos, '
           'create your own playlists, and enjoy high quality streaming.',
