@@ -19,6 +19,7 @@ class ProjectModel {
     this.urlLink,
     this.category,
     this.thumbnailAsset,
+    this.screenshots,
   });
 
   final String index;
@@ -26,6 +27,7 @@ class ProjectModel {
   final String year;
   final String description;
   final List<String> techStack;
+  final List<String>? screenshots;
   final String? role;
   final String? githubUrl;
   final String? playStoreUrl;
@@ -49,8 +51,7 @@ class ProjectModel {
           ? ProjectCategory.values.firstWhere(
             (e) => e.toString() == map['category'],
         orElse: () => ProjectCategory.personal,
-      )
-          : null,
+      ) : null,
     );
   }
 

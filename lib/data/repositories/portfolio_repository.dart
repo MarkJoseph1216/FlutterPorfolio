@@ -180,10 +180,52 @@ abstract final class PortfolioRepository {
       techStack: ['Flutter', 'Dart', 'Laravel'],
       category: ProjectCategory.freelance,
       thumbnailAsset: 'assets/thumbnails/hatidgo.png',
-      urlLink: 'https://www.facebook.com/profile.php?id=61576444353477',
+      urlLink: 'https://hatidgo.com/home/',
     ),
     ProjectModel(
       index: '02',
+      title: 'MasidStream',
+      year: '2026',
+      role: 'Mobile/Web',
+      description:
+      'An ad free movie streaming app. Browse a wide selection of movies and series, '
+          'watch instantly or with friends using real time syncing, and keep track of your favorites.',
+      techStack: ['Flutter', 'Dart', 'Flutter Animate', 'Supabase', 'Laravel'],
+      category: ProjectCategory.personal,
+      thumbnailAsset: 'assets/showcase/masid_stream/0.png',
+      screenshots: [
+        'assets/showcase/masid_stream/1.png',
+        'assets/showcase/masid_stream/2.png',
+        'assets/showcase/masid_stream/3.png',
+        'assets/showcase/masid_stream/7.png',
+        'assets/showcase/masid_stream/5.png',
+        'assets/showcase/masid_stream/4.png',
+        'assets/showcase/masid_stream/6.png',
+        'assets/showcase/masid_stream/8.png',
+      ],
+    ),
+    ProjectModel(
+      index: '03',
+      title: 'MasidTunes',
+      year: '2026',
+      role: 'Mobile/Web',
+      description:
+      'A spotify style music app with zero ads. Discover new tracks, watch music videos, '
+          'create your own playlists, and enjoy high quality streaming.',
+      techStack: ['Flutter', 'Dart', 'Flutter Animate'],
+      category: ProjectCategory.personal,
+      thumbnailAsset: 'assets/showcase/masid_tunes/0.png',
+      screenshots: [
+        'assets/showcase/masid_tunes/1.png',
+        'assets/showcase/masid_tunes/2.png',
+        'assets/showcase/masid_tunes/3.png',
+        'assets/showcase/masid_tunes/7.png',
+        'assets/showcase/masid_tunes/5.png',
+        'assets/showcase/masid_tunes/4.png',
+      ],
+    ),
+    ProjectModel(
+      index: '04',
       title: 'Personal Mobile Assistant',
       year: '2023',
       role: 'Android',
@@ -198,7 +240,7 @@ abstract final class PortfolioRepository {
       'https://www.tiktok.com/@dev.imrkjoseph/video/7268900076364336389',
     ),
     ProjectModel(
-      index: '03',
+      index: '05',
       title: 'Motorcycle Fingerprint Security',
       year: '2023',
       description:
@@ -212,7 +254,7 @@ abstract final class PortfolioRepository {
       'https://www.tiktok.com/@dev.imrkjoseph/video/7273514618864127238',
     ),
     ProjectModel(
-      index: '04',
+      index: '06',
       title: 'Animeflix',
       year: '2024',
       role: 'Android/iOS',
@@ -226,7 +268,7 @@ abstract final class PortfolioRepository {
       'https://www.tiktok.com/@dev.imrkjoseph/video/7350223416059759878',
     ),
     ProjectModel(
-      index: '05',
+      index: '07',
       title: 'KwikSerbisyo',
       year: '2023',
       role: 'Mobile/Web',
@@ -239,7 +281,7 @@ abstract final class PortfolioRepository {
       urlLink: 'https://kwikserbisyo.online/',
     ),
     ProjectModel(
-      index: '06',
+      index: '08',
       title: 'Traysitek',
       year: '2023',
       role: 'Mobile/Web',
@@ -253,7 +295,7 @@ abstract final class PortfolioRepository {
       urlLink: 'https://traysikel.tech/',
     ),
     ProjectModel(
-      index: '07',
+      index: '09',
       title: 'E-Robot',
       year: '2019',
       description:

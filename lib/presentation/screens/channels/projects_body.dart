@@ -11,18 +11,9 @@ class ProjectsBody extends StatelessWidget {
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(12 * fs, 20 * fs, 12 * fs, 14 * fs),
       child: Column(
-        children: PortfolioRepository.sideProjects.asMap().entries.map((e) {
-          final p = e.value;
+        children: PortfolioRepository.sideProjects.map((p) {
           return ProjectRow(
-            number: p.index,
-            title: p.title,
-            role: p.role ?? '',
-            description: p.description,
-            tech: p.techStack.take(3).join(' · '),
-            year: p.year,
-            category: p.category?.label,
-            url: p.urlLink ?? p.playStoreUrl,
-            thumbnailAsset: p.thumbnailAsset,
+            project: p,
             fs: fs,
           );
         }).toList(),
