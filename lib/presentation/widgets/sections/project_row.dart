@@ -222,12 +222,15 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
                           ),
                         ),
                         SizedBox(height: 3 * fs),
-                        Text(
-                          project.techStack.take(3).join(' · '),
-                          style: AppFonts.tvRetro(
-                            color: colors.warmWhiteDim,
-                            size: isCompact ? 6 * fs : 7 * fs,
-                            letterSpacing: 1,
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 250),
+                          child: Text(
+                            project.techStack.join(' · '),
+                            style: AppFonts.tvRetro(
+                              color: colors.warmWhiteDim,
+                              size: isCompact ? 6 * fs : 7 * fs,
+                              letterSpacing: 1,
+                            ),
                           ),
                         ),
                       ],
@@ -290,20 +293,23 @@ class _ProjectRowState extends State<ProjectRow> with SingleTickerProviderStateM
                           SizedBox(height: 8 * fs),
                           GestureDetector(
                             onTap: _onViewProject,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'VIEW PROJECT  ↗',
-                                  style: AppFonts.tvRetro(
-                                    color: colors.tvAccent,
-                                    size: isCompact ? 7 * fs : 8 * fs,
-                                    letterSpacing: 2,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 8, top: 8, right: 16),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'VIEW PROJECT  ↗',
+                                    style: AppFonts.tvRetro(
+                                      color: colors.tvAccent,
+                                      size: isCompact ? 7 * fs : 8 * fs,
+                                      letterSpacing: 2,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
+                          )
                         ],
                       ],
                     ),
