@@ -200,8 +200,11 @@ abstract final class PortfolioRepository {
         'assets/showcase/masid_stream/4.png',
         'assets/showcase/masid_stream/5.png',
         'assets/showcase/masid_stream/6.png',
-        'assets/showcase/masid_stream/7.png',
+        'assets/showcase/masid_stream/7.jpeg',
         'assets/showcase/masid_stream/8.png',
+        'assets/showcase/masid_stream/9.png',
+        'assets/showcase/masid_stream/10.png',
+        'assets/showcase/masid_stream/11.png',
       ],
     ),
     ProjectModel(
