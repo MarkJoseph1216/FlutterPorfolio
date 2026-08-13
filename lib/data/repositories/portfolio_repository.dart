@@ -293,7 +293,7 @@ abstract final class PortfolioRepository {
       techStack: ['Laravel', 'Flutter', 'Dart'],
       category: ProjectCategory.freelance,
       thumbnailAsset: 'assets/thumbnails/traysitek.jpg',
-      urlLink: 'https://traysikel.tech/',
+      urlLink: 'https://traysitek.com',
     ),
     ProjectModel(
       index: '09',
